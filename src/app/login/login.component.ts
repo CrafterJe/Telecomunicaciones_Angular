@@ -16,22 +16,28 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  // En login.component.ts
   login(): void {
     const credentials = {
-      usuario: this.username,  // Cambiar 'username' a 'usuario'
+      usuario: this.username,
       password: this.password
     };
 
+    console.log('Intentando login con:', credentials);
+
     this.authService.login(credentials).subscribe({
       next: (data) => {
-        // Guardar el token JWT en el localStorage
+        console.log('Login exitoso:', data);
+        alert('Login exitoso');
         localStorage.setItem('token', data.token);
-        this.router.navigate(['/home']);  // Ajusta la ruta a tu página principal
+        this.router.navigate(['/Home']);
       },
       error: (err) => {
-        console.error('Error de login', err);
-        alert('Usuario o contraseña incorrectos.');
+        console.log('Error detallado:', err);
+        console.log('Status:', err.status);
+        console.log('Mensaje:', err.error);
+        alert('Error: ' + (err.error?.message || 'Usuario o contraseña incorrectos'));
       }
     });
-  }
+}
 }

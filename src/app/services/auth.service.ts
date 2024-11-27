@@ -11,8 +11,9 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { usuario: string, password: string }): Observable<any> {
+    console.log('Enviando request a:', `${this.apiUrl}/login`);
     return this.http.post<any>(`${this.apiUrl}/login`, credentials);
-  }
+}
 
   register(user: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, user);  // Enviar los datos al backend para registrar al usuario
