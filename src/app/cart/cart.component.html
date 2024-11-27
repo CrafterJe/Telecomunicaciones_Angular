@@ -1,0 +1,67 @@
+<div class="cart-container">
+  <h2>Mi Carrito de Compras</h2>
+
+  <!-- Verifica si el carrito tiene productos -->
+  <div *ngIf="carrito.length > 0; else carritoVacio">
+    <div class="cart-item" *ngFor="let producto of carrito">
+      <div class="item-details">
+        <h3>{{ producto.nombre }}</h3>
+        <p>Cantidad: {{ producto.cantidad }}</p>
+        <p>Precio Unitario: ${{ producto.precio_unitario }}</p>
+        <p>Total: ${{ producto.precio_unitario * producto.cantidad }}</p>
+      </div>
+      <hr>
+    </div>
+
+    <!-- Mostrar total -->
+    <div class="total">
+      <h3>Total: ${{ total }}</h3>
+    </div>
+
+    <!-- Botón para proceder al pago -->
+    <button class="checkout-btn">Proceder al Pago</button>
+  </div>
+
+  <!-- Mensaje si el carrito está vacío -->
+  <ng-template #carritoVacio>
+    <p>Tu carrito está vacío. Agrega productos para empezar.</p>
+  </ng-template>
+</div>
+
+<!-- Estilos básicos (puedes modificarlos según tu diseño) -->
+<style>
+  .cart-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+  }
+
+  .item-details {
+    max-width: 70%;
+  }
+
+  .total {
+    margin-top: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  .checkout-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .checkout-btn:hover {
+    background-color: #218838;
+  }
+</style>
