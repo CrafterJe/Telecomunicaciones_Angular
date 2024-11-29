@@ -1,0 +1,440 @@
+/* Imports y variables */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset y estilos base */
+:host {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Wrapper principal */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+}
+
+/* Formas animadas del fondo */
+.shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.4;
+    animation: floatAnimation 20s infinite;
+}
+
+.shape-1 {
+    background: #6366f1;
+    width: 300px;
+    height: 300px;
+    top: -150px;
+    right: -100px;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    background: #ec4899;
+    width: 250px;
+    height: 250px;
+    bottom: -100px;
+    left: -100px;
+    animation-delay: 5s;
+}
+
+.shape-3 {
+    background: #8b5cf6;
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    right: 10%;
+    animation-delay: 10s;
+}
+
+.shape-4 {
+    background: #10b981;
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    right: 20%;
+    animation-delay: 15s;
+}
+
+@keyframes floatAnimation {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
+/* Contenedor principal */
+.login-container {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+    animation: containerAppear 0.6s ease-out;
+}
+
+@keyframes containerAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sección de marca */
+.brand-section {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo-wrapper {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    transform: rotate(-10deg);
+    transition: transform 0.3s ease;
+}
+
+.logo-wrapper:hover {
+    transform: rotate(0deg) scale(1.1);
+}
+
+.brand-icon {
+    color: white;
+    width: 35px;
+    height: 35px;
+}
+
+.brand-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+/* Estilos del formulario */
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.form-group .icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    color: #6366f1;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+    transition: all 0.3s ease;
+    color: var(--text);
+    position: relative;
+    z-index: 1;
+}
+
+.input-focus-bg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    opacity: 0.1;
+    border-radius: 12px;
+    transition: width 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.form-input:focus+.input-focus-bg {
+    width: 100%;
+}
+
+/* Opciones del formulario */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    accent-color: #6366f1;
+}
+
+.forgot-password {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: #4f46e5;
+}
+
+/* Botones de acción */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.btn-login,
+.btn-register {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px #6366f1;
+}
+
+.btn-register {
+    background: white;
+    border: 2px solid #6366f1;
+    color:#6366f1;
+}
+
+.btn-register:hover {
+    background: #6366f1;
+    color: white;
+}
+
+.btn-icon {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.btn-login:hover .btn-icon,
+.btn-register:hover .btn-icon {
+    transform: translateX(5px);
+}
+
+/* Divisor */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #6b7280;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.divider span {
+    padding: 0 1rem;
+}
+
+/* Login social */
+.social-login {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.social-text {
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.social-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.social-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    border-color: #6366f1;
+}
+
+.social-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .login-container {
+        padding: 2rem;
+        margin: 1rem;
+    }
+
+    .brand-title {
+        font-size: 1.75rem;
+    }
+
+    .form-options {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .social-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.btn-login:active {
+    animation: pulse 0.3s ease-in-out;
+}
+
+/* Efectos hover mejorados */
+.form-input:hover {
+    border-color: #d1d5db;
+}
+
+.social-btn:hover {
+    box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Efectos de carga */
+.btn-login.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-login.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    to {
+        transform: translateX(100%);
+    }
+}

@@ -1,67 +1,70 @@
-<div class="cart-container">
-  <h2>Mi Carrito de Compras</h2>
-
-  <!-- Verifica si el carrito tiene productos -->
-  <div *ngIf="carrito.length > 0; else carritoVacio">
-    <div class="cart-item" *ngFor="let producto of carrito">
-      <div class="item-details">
-        <h3>{{ producto.nombre }}</h3>
-        <p>Cantidad: {{ producto.cantidad }}</p>
-        <p>Precio Unitario: ${{ producto.precio_unitario }}</p>
-        <p>Total: ${{ producto.precio_unitario * producto.cantidad }}</p>
-      </div>
-      <hr>
-    </div>
-
-    <!-- Mostrar total -->
-    <div class="total">
-      <h3>Total: ${{ total }}</h3>
-    </div>
-
-    <!-- Botón para proceder al pago -->
-    <button class="checkout-btn">Proceder al Pago</button>
+<div class="container mx-auto p-6 cart-container">
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Cargando tu carrito...</div>
   </div>
 
-  <!-- Mensaje si el carrito está vacío -->
-  <ng-template #carritoVacio>
-    <p>Tu carrito está vacío. Agrega productos para empezar.</p>
-  </ng-template>
+  <div class="error-alert" *ngIf="!loading && error">
+    <div class="error-content">
+      <i class="fas fa-exclamation-circle icon"></i>
+      <h3 class="error-title">¡Atención!</h3>
+      <p [innerHTML]="error" class="error-message">{{ error }}</p>
+      <button class="login-button" routerLink="/login" routerLinkActive="active">
+        <a  href="#">
+          <i class="fas fa-sign-in-alt"></i> ¡Empieza desde ahora!
+        </a>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && carrito?.productos?.length > 0">
+    <div class="cart-header">
+      <h2><i class="fas fa-shopping-cart"></i> Carrito de Compras</h2>
+      <div class="items-count"><i class="fas fa-box"></i> {{ carrito.productos.length }} productos en el carrito</div>
+    </div>
+    <div class="products-list">
+      <div *ngFor="let producto of carrito.productos" class="product-card">
+        <div class="product-info">
+          <div class="product-details">
+            <span class="product-name"><i class="fas fa-tag"></i> {{ producto.nombre }}</span>
+            <span class="product-price text-green-500"><i class="fas fa-dollar-sign"></i> {{ producto.precio }}</span>
+          </div>
+        </div>
+        <div class="product-actions">
+          <div class="quantity-control">
+            <button class="quantity-btn bg-red-100 hover:bg-red-200" (click)="actualizarCantidad(producto._id, producto.cantidad - 1)" [disabled]="producto.cantidad <= 1"><i class="fas fa-minus"></i></button>
+            <input type="number" class="quantity-input bg-gray-100" [value]="producto.cantidad" readonly/>
+            <button class="quantity-btn bg-green-100 hover:bg-green-200" (click)="actualizarCantidad(producto._id, producto.cantidad + 1)"><i class="fas fa-plus"></i></button>
+          </div>
+          <button class="delete-btn bg-red-500 text-white rounded hover:bg-red-600" (click)="eliminarProducto(producto._id)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <div class="subtotal">
+        <span><i class="fas fa-receipt"></i> Subtotal:</span>
+        <span class="text-blue-600 font-semibold">${{ carrito.total }}</span>
+      </div>
+      <div class="total">
+        <span><i class="fas fa-money-bill-wave"></i> Total:</span>
+        <span class="text-green-600 font-bold">${{ (carrito.total * 1.161).toFixed(2) + " + 16% IVA"}}</span>
+      </div>
+      <button class="checkout-btn shadow-lg">
+        <i class="fas fa-credit-card"></i> Proceder al pago
+      </button>
+    </div>
+  </div>
+
+  <div class="empty-cart" *ngIf="!loading && !error && (!carrito?.productos || carrito.productos.length === 0)">
+    <div class="empty-cart-content">
+      <i class="fas fa-shopping-cart empty-cart-icon"></i>
+      <h2 class="empty-cart-title">Tu carrito está vacío</h2>
+      <p class="empty-cart-text">Parece que aún no has agregado productos. ¡Descubre nuestros artículos increíbles!</p>
+      <button class="continue-shopping" routerLink="/catalog-products" routerLinkActive="active">
+        <i class="fas fa-arrow-left"></i> Seguir comprando
+      </button>
+    </div>
+  </div>
 </div>
-
-<!-- Estilos básicos (puedes modificarlos según tu diseño) -->
-<style>
-  .cart-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-  }
-
-  .item-details {
-    max-width: 70%;
-  }
-
-  .total {
-    margin-top: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-  }
-
-  .checkout-btn {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
-  }
-
-  .checkout-btn:hover {
-    background-color: #218838;
-  }
-</style>

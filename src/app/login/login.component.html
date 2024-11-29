@@ -1,14 +1,76 @@
-<form (ngSubmit)="login()">
-  <div>
-    <label for="username">Username:</label>
-    <input type="text" id="username" [(ngModel)]="username" name="username" required>
+<div class="login-wrapper">
+  <!-- Animated shapes background -->
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
   </div>
 
-  <div>
-    <label for="password">Password:</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required>
-  </div>
+  <!-- Main login container -->
+  <div class="login-container">
+    <!-- Logo/Brand section -->
+    <div class="brand-section">
+      <div class="logo-wrapper">
+        <i class="fa-brands fa-bandcamp fa-2xl" style="color: #ffffff;"></i>
+      </div>
+      <h1 class="brand-title">¡Bienvenido!</h1>
+      <p class="brand-subtitle">Nos alegra verte de nuevo</p>
+    </div>
 
-  <button type="submit">Iniciar sesión</button>
-  <button type="button" routerLink="/register" routerLinkActive="active">Registrarse</button>
-</form>
+    <!-- Login form -->
+    <form (ngSubmit)="login()" class="login-form">
+      <div class="form-group">
+        <label for="username">
+          <i class="icon" data-feather="user"></i>
+          <span class="label-text">Usuario</span>
+        </label>
+        <input
+          type="text"
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          required
+          placeholder="Ingresa tu nombre de usuario"
+          class="form-input"
+          minlength="5"
+          maxlength="12">
+        <div class="input-focus-bg"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          <i class="icon" data-feather="lock"></i>
+          <span class="label-text">Contraseña</span>
+        </label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="Ingresa tu contraseña"
+          class="form-input"
+          minlength="5"
+          maxlength="12">
+        <div class="input-focus-bg"></div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="submit" class="btn-login">
+          <span class="btn-text">Iniciar Sesión</span>
+          <i class="btn-icon" data-feather="arrow-right"></i>
+        </button>
+
+        <div class="divider">
+          <span>O</span>
+        </div>
+
+        <button type="button" routerLink="/register" routerLinkActive="active" class="btn-register">
+          <span class="btn-text">Crear Cuenta Nueva</span>
+          <i class="btn-icon" data-feather="user-plus"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

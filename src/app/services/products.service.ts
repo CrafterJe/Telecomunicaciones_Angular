@@ -21,7 +21,7 @@ interface Producto {
 })
 export class ProductsService {
 
-  private apiUrl = 'http://127.0.0.1:4000/productos/get_all';
+  private apiUrl = 'http://127.0.0.1:5000/productos/get_all';
 
   constructor(private http: HttpClient) { }
 

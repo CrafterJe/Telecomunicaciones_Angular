@@ -1,0 +1,210 @@
+/* Importación de fuentes */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:host {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Loading State */
+.animate-spin {
+    border-width: 4px;
+    border-color: #2563eb #e5e7eb #e5e7eb #e5e7eb;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Products Grid */
+.grid {
+    display: grid;
+    gap: 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Product Card */
+.bg-white {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.1);
+}
+
+.bg-white:hover {
+    transform: translateY(-10px);
+    border-color: #8b5cf6;
+    box-shadow: 0 15px 30px rgba(149, 37, 235, 0.2);
+}
+
+/* Product Content */
+.p-4 {
+    padding: 1.5rem;
+}
+
+/* Product Title */
+.text-xl {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #8b5cf6;
+    margin-bottom: 0.75rem;
+}
+
+/* Product Type */
+.text-gray-600 {
+    display: inline-block;
+    background: #e0e7ff;
+    color: #1e40af;
+    padding: 0.25rem 1rem;
+    border-radius: 15px;
+    font-size: 0.875rem;
+}
+
+/* Price */
+.text-blue-600 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #6366f1;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Specifications */
+.mb-4 {
+    background: #f8f9ff;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.text-gray-700 {
+    color: #1e40af;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+ul li::before {
+    content: "•";
+    color: #8b5cf6;
+    position: absolute;
+    left: 0.5rem;
+}
+
+/* Stock and Button Container */
+.flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+/* Stock Text */
+.text-gray-500 {
+    font-size: 0.875rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+/* Button */
+button {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white !important;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+button:not([disabled]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+}
+
+button[disabled] {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+/* Error State */
+.bg-red-100 {
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Empty State */
+.text-center {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1280px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    button {
+        padding: 0.5rem 1rem;
+    }
+}
