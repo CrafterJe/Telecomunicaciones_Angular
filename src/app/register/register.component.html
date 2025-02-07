@@ -1,28 +1,110 @@
-<div class="register-container">
-  <h2>Registrarse</h2>
-  <form (ngSubmit)="register()">
-    <div class="form-group">
-      <label for="nombre">Nombre completo</label>
-      <input type="text" id="nombre" class="form-control" [(ngModel)]="nombre" name="nombre" required />
+<div class="login-wrapper">
+  <!-- Animated shapes background -->
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+
+  <!-- Main register container -->
+  <div class="login-container">
+    <!-- Logo/Brand section -->
+    <div class="brand-section">
+      <div class="logo-wrapper">
+        <i class="fa-brands fa-bandcamp fa-2xl" style="color: #ffffff;"></i>
+      </div>
+      <h1 class="brand-title">¡Únete a nosotros!</h1>
+      <p class="brand-subtitle">Crea tu cuenta en unos pasos</p>
     </div>
 
-    <div class="form-group">
-      <label for="usuario">Nombre de usuario</label>
-      <input type="text" id="usuario" class="form-control" [(ngModel)]="usuario" name="usuario" required />
-    </div>
+    <!-- Register form -->
+    <form (ngSubmit)="register()" class="register-form">
+      <div class="form-group">
+        <label for="nombre">
+          <i class="icon" data-feather="user"></i>
+          <span class="label-text">Nombre completo</span>
+        </label>
+        <input
+        type="text"
+        id="nombre"
+        class="form-input"
+        [(ngModel)]="nombre"
+        name="nombre"
+        required
+        placeholder="Ingresa tu nombre completo"
+        />
+        <div class="input-focus-bg"></div>
+      </div>
 
-    <div class="form-group">
-      <label for="email">Correo electrónico</label>
-      <input type="email" id="email" class="form-control" [(ngModel)]="email" name="email" required />
-    </div>
+      <div class="form-group">
+        <label for="usuario">
+          <i class="icon" data-feather="user-check"></i>
+          <span class="label-text">Nombre de usuario</span>
+        </label>
+        <input
+          type="text"
+          id="usuario"
+          [(ngModel)]="usuario"
+          name="usuario"
+          required
+          placeholder="Crea un nombre de usuario"
+          class="form-input"
+          minlength="5"
+          maxlength="12">
+        <div class="input-focus-bg"></div>
+      </div>
 
-    <div class="form-group">
-      <label for="password">Contraseña</label>
-      <input type="password" id="password" class="form-control" [(ngModel)]="password" name="password" required />
-    </div>
+      <div class="form-group">
+        <label for="email">
+          <i class="icon" data-feather="mail"></i>
+          <span class="label-text">Correo electrónico</span>
+        </label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          placeholder="Ingresa tu correo electrónico"
+          class="form-input">
+        <div class="input-focus-bg"></div>
+      </div>
 
-    <div class="form-group">
-      <button type="submit" class="btn btn-primary">Registrar</button>
-    </div>
-  </form>
+      <div class="form-group">
+        <label for="password">
+          <i class="icon" data-feather="lock"></i>
+          <span class="label-text">Contraseña</span>
+        </label>
+        <input
+          type="password"
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder="Crea una contraseña"
+          class="form-input"
+          minlength="5"
+          maxlength="12">
+        <div class="input-focus-bg"
+        ></div>
+      </div>
+
+      <div class="action-buttons">
+        <button type="submit" class="btn-register">
+          <span class="btn-text">Registrarse</span>
+          <i class="btn-icon" data-feather="check-circle"></i>
+        </button>
+
+        <div class="divider">
+          <span>O</span>
+        </div>
+
+        <button type="button" routerLink="/login" routerLinkActive="active" class="btn-login">
+          <span class="btn-text">Iniciar Sesión</span>
+          <i class="btn-icon" data-feather="arrow-left"></i>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

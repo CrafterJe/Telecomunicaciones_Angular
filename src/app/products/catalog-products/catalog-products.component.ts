@@ -1,8 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../services/products.service';
-import { CartserviceService } from '../../services/cartservice.service';
+import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
+import { jwtDecode } from 'jwt-decode';  // Importa jwtDecode en lugar de jwt_decode
 
+interface CustomJwtPayload {
+  user_id: string;
+  // Aquí puedes agregar otras propiedades que contenga tu token, si es necesario
+}
 interface Especificaciones {
   ram: number;
   procesador: string;
@@ -25,16 +31,26 @@ interface Producto {
   styleUrls: ['./catalog-products.component.css']
 })
 export class CatalogProductsComponent implements OnInit {
-  productos: Producto[] = [];
+  productos: any[] = [];
   loading: boolean = true;
   error: string | null = null;
+  userId: string | null = null;
 
-  constructor(private productsService: ProductsService,
-    private cartService: CartserviceService
-  ) {}
+  constructor(
+    private productsService: ProductsService,
+    private cartService: CartService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.cargarProductos();
+
+    // Extraer el user_id del token usando jwtDecode y el tipo personalizado
+    const token = this.authService.getToken();
+    if (token) {
+      const decodedToken = jwtDecode<CustomJwtPayload>(token);  // Decodificamos el token con el tipo personalizado
+      this.userId = decodedToken.user_id;  // Ahora TypeScript sabe que 'user_id' existe
+    }
   }
 
   cargarProductos(): void {
@@ -47,31 +63,31 @@ export class CatalogProductsComponent implements OnInit {
       error: (error) => {
         this.error = 'Error al cargar los productos';
         this.loading = false;
-        console.error('Error:', error);
       }
     });
   }
 
-  agregarAlCarrito(producto: Producto): void {
-    if (producto.stock > 0) {
-      // Supongamos que el 'userId' es el ID del usuario autenticado
-      const userId = 'user123';  // Obtén esto según el contexto de tu aplicación
-
-      this.cartService.agregarProducto(userId, {
-        _id: producto._id,
-        nombre: producto.nombre,
-        cantidad: 1,
-        precio_unitario: producto.precio
-      }).subscribe({
-        next: () => {
-          producto.stock--;  // Actualizamos el stock localmente
-        },
-        error: (err) => {
-          console.error('Error al agregar producto al carrito', err);
-        }
-      });
-    } else {
-      console.warn(`El producto ${producto.nombre} no tiene stock disponible.`);
+  // catalog-products.component.ts
+  agregarAlCarrito(productoId: string, cantidad: number): void {
+    if (!this.userId) {
+      alert('Inicia sesión para agregar productos al carrito');
+      return;
     }
+
+    this.cartService.agregarAlCarrito(this.userId, productoId, cantidad).subscribe({
+      next: (response: any) => {
+        console.log('Producto agregado al carrito:', response);
+        alert('Producto agregado exitosamente.');
+      },
+      error: (error: any) => {
+        console.error('Error al agregar producto al carrito:', error);
+        alert('No se pudo agregar el producto al carrito.');
+      },
+    });
   }
+
+
+
+
+
 }

@@ -1,49 +1,143 @@
-<!-- Main Content -->
-<div class="container my-5">
-  <div class="text-center">
-    <h1 class="display-4 text-primary">Bienvenido a TelecomCompras</h1>
-    <p class="lead">
-      Descubre la forma más sencilla de adquirir computadoras, laptops y tabletas a crédito. Una solución diseñada para nuestros clientes y sus necesidades.
-    </p>
-    <a routerLink="/catalog-products" routerLinkActive="active" class="btn btn-primary btn-lg mt-3">
-      Ver Productos
-    </a>
-
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content">
+      <h1 class="hero-title">TelecomCompras</h1>
+      <p class="hero-subtitle">Descubre la tecnología que transformará tu vida</p>
+      <div class="search-box">
+          <a routerLink="/catalog-products" routerLinkActive="active" href="#" class="search-button">
+              <i class="fas fa-search"></i>
+              Ver catálogo de productos
+          </a>
+      </div>
   </div>
-</div>
+  <div class="hero-overlay"></div>
+</section>
 
 <!-- Features Section -->
-<div class="container mt-5">
-  <h2 class="text-center mb-4">¿Qué ofrecemos?</h2>
-  <div class="row text-center">
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-primary">Variedad de Dispositivos</h5>
-          <p class="card-text">Accede a computadoras, laptops y tabletas con las mejores especificaciones y marcas.</p>
-        </div>
+<section class="features-section">
+  <h2 class="section-title">Nuestras Ventajas</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-laptop"></i>
       </div>
+      <h3>Últimos Modelos</h3>
+      <p>Equipos de última generación con las mejores especificaciones del mercado.</p>
     </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-primary">Facilidad de Crédito</h5>
-          <p class="card-text">Paga en cómodas cuotas mensuales, adaptadas a tus necesidades y presupuesto.</p>
-        </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-credit-card"></i>
       </div>
+      <h3>Crédito Flexible</h3>
+      <p>Planes de financiamiento adaptados a tu presupuesto y necesidades.</p>
     </div>
-    <div class="col-md-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-primary">Soporte Técnico Dedicado</h5>
-          <p class="card-text">Nuestro equipo está disponible para resolver cualquier inconveniente con tu dispositivo.</p>
-        </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <i class="fas fa-headset"></i>
       </div>
+      <h3>Soporte Premium</h3>
+      <p>Asistencia técnica especializada disponible cuando la necesites.</p>
     </div>
   </div>
-</div>
+</section>
+
+<!-- Brands Section -->
+<section class="top-products-section">
+  <h2 class="section-title">Productos Más Vendidos</h2>
+  <div class="products-grid">
+    <div class="product-card">
+      <div class="product-info">
+        <h3 class="product-title">Laptop Gamer</h3>
+        <p class="product-price">$25,999 MXN</p>
+      </div>
+      <button class="product-button" routerLink="/catalog-products" routerLinkActive="active">¡Comprar ahora!</button>
+    </div>
+    <div class="product-card">
+      <div class="product-info">
+        <h3 class="product-title">Smartphone Galaxy</h3>
+        <p class="product-price">$15,499 MXN</p>
+      </div>
+      <button class="product-button" routerLink="/catalog-products" routerLinkActive="active">¡Comprar ahora!</button>
+    </div>
+    <div class="product-card">
+      <div class="product-info">
+        <h3 class="product-title">Tablet Pro</h3>
+        <p class="product-price">$12,799 MXN</p>
+      </div>
+      <button class="product-button" routerLink="/catalog-products" routerLinkActive="active">¡Comprar ahora!</button>
+    </div>
+    <div class="product-card">
+      <div class="product-info">
+        <h3 class="product-title">Audífonos Bluetooth</h3>
+        <p class="product-price">$1,499 MXN</p>
+      </div>
+      <button class="product-button" routerLink="/catalog-products" routerLinkActive="active">¡Comprar ahora!</button>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials-section">
+  <h2 class="section-title">¿Qué dicen nuestros clientes?</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="testimonial-icon">
+        <i class="fas fa-quote-left"></i>
+      </div>
+      <p class="testimonial-text">"La mejor experiencia de compra. Excelente calidad y atención al cliente."</p>
+      <h3 class="testimonial-author">- Juan Pérez</h3>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-icon">
+        <i class="fas fa-quote-left"></i>
+      </div>
+      <p class="testimonial-text">"Precios accesibles y una amplia variedad de productos. ¡Totalmente recomendado!"</p>
+      <h3 class="testimonial-author">- María González</h3>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-icon">
+        <i class="fas fa-quote-left"></i>
+      </div>
+      <p class="testimonial-text">"Compré mi laptop y llegó a tiempo. Excelente servicio y soporte técnico."</p>
+      <h3 class="testimonial-author">- Carlos Ramírez</h3>
+    </div>
+  </div>
+</section>
+
+<section class="benefits-section">
+  <h2 class="section-title">¿Por qué elegirnos?</h2>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-truck"></i>
+      </div>
+      <h3 class="benefit-title">Envíos rápidos</h3>
+      <p class="benefit-description">Recibe tus productos en tiempo récord con nuestro servicio de entrega ágil y seguro.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h3 class="benefit-title">Compra segura</h3>
+      <p class="benefit-description">Tus pagos están protegidos con la última tecnología de seguridad.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-star"></i>
+      </div>
+      <h3 class="benefit-title">Calidad garantizada</h3>
+      <p class="benefit-description">Solo trabajamos con las mejores marcas para garantizar productos de alta calidad.</p>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">
+        <i class="fas fa-headset"></i>
+      </div>
+      <h3 class="benefit-title">Soporte 24/7</h3>
+      <p class="benefit-description">Nuestro equipo está disponible para ayudarte en cualquier momento.</p>
+    </div>
+  </div>
+</section>
 
 <!-- Footer -->
-<footer class="bg-body-tertiary text-center py-4 mt-5">
-  <p class="mb-0">© 2024 TelecomCompras. Todos los derechos reservados.</p>
+<footer class="bg-body-tertiary text-center py-4">
+  <p class="mb-0 text-muted">© 2024 TelecomCompras. Todos los derechos reservados.</p>
 </footer>

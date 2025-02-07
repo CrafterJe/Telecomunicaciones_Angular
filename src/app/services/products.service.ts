@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_URL } from '../config/api.config';
 
-interface Especificaciones {
+// Definir las interfaces en un archivo separado
+export interface Especificaciones {
   ram: number;
   procesador: string;
 }
 
-interface Producto {
+export interface Producto {
   _id: string;
   nombre: string;
   tipo: string;
@@ -20,12 +22,11 @@ interface Producto {
   providedIn: 'root'
 })
 export class ProductsService {
-
-  private apiUrl = 'http://127.0.0.1:4000/productos/get_all';
+  private apiUrl = API_URL;  // URL base
 
   constructor(private http: HttpClient) { }
 
   getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
+    return this.http.get<Producto[]>(`${this.apiUrl}/productos/get_all`);
   }
 }
