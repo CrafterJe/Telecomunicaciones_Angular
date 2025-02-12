@@ -10,12 +10,12 @@ import { API_URL } from '../config/api.config';
   providedIn: 'root'
 })
 export class AuthService {
-  //private apiUrl = 'http://127.0.0.1:5000';
   private apiUrl = API_URL;
   private usernameSubject = new BehaviorSubject<string | null>(null);
+  private roleSubject = new BehaviorSubject<string | null>(null); // Para el rol
 
   constructor(private http: HttpClient) {
-    this.initializeUsername(); // Inicializa el estado del username al cargar el servicio
+    this.initializeUserState(); // Inicializa el estado al cargar el servicio
   }
 
   /**
@@ -78,10 +78,12 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/register`, user).pipe(
       catchError((error) => {
         console.error('Error en el registro:', error);
-        return throwError(() => new Error('Error en el registro. Por favor, intenta nuevamente.'));
+        alert('Error en el registro: ' + (error.error?.error || 'Verifica los datos ingresados'));
+        return throwError(() => new Error('Error en el registro. Intenta nuevamente.'));
       })
     );
   }
+
 
   /**
    * Verificar si el usuario está autenticado
@@ -117,10 +119,24 @@ export class AuthService {
   }
 
   /**
-   * Actualizar el estado del `username`
+   * Obtener el observable del `rol`
    */
-  setUsername(username: string | null): void {
-    this.usernameSubject.next(username);
+  getUserRole$(): Observable<string | null> {
+    return this.roleSubject.asObservable();
+  }
+
+  /**
+   * Método para obtener el rol del usuario
+   */
+  getUserRole(): string {
+    return this.getFromLocalStorage('rol') || 'usuario'; // Por defecto, usuario
+  }
+
+  /**
+   * Verificar si el usuario es administrador
+   */
+  isAdmin(): boolean {
+    return this.getUserRole() === 'admin';
   }
 
   /**
@@ -133,6 +149,7 @@ export class AuthService {
       const decodedToken: any = this.decodeToken(token);
       const username = decodedToken?.nombre || 'Usuario';
       const userId = decodedToken?.user_id;
+      const rol = decodedToken?.rol || 'usuario'; // Si no tiene rol, se asigna usuario
 
       if (username) {
         this.saveToLocalStorage('username', username);
@@ -141,6 +158,11 @@ export class AuthService {
 
       if (userId) {
         this.saveToLocalStorage('userId', userId);
+      }
+
+      if (rol) {
+        this.saveToLocalStorage('rol', rol);
+        this.roleSubject.next(rol);
       }
     } catch (error) {
       console.error('Error al procesar el token en handleLogin:', error);
@@ -154,17 +176,21 @@ export class AuthService {
     this.removeFromLocalStorage('token');
     this.removeFromLocalStorage('username');
     this.removeFromLocalStorage('userId');
+    this.removeFromLocalStorage('rol'); // Eliminamos el rol
 
     this.usernameSubject.next(null);
+    this.roleSubject.next(null);
     window.location.href = '/Home';
   }
 
   /**
-   * Inicializar el `username` desde el token o `localStorage`
+   * Inicializar el `username` y `rol` desde el token o `localStorage`
    */
-  private initializeUsername(): void {
+  private initializeUserState(): void {
     try {
       const username = this.getFromLocalStorage('username');
+      const rol = this.getFromLocalStorage('rol');
+
       if (username) {
         this.usernameSubject.next(username);
       } else {
@@ -175,8 +201,19 @@ export class AuthService {
           this.usernameSubject.next(usernameFromToken);
         }
       }
+
+      if (rol) {
+        this.roleSubject.next(rol);
+      } else {
+        const token = this.getToken();
+        if (token) {
+          const decodedToken = this.decodeToken(token);
+          const roleFromToken = decodedToken?.rol || 'usuario';
+          this.roleSubject.next(roleFromToken);
+        }
+      }
     } catch (error) {
-      console.error('Error al inicializar el nombre de usuario:', error);
+      console.error('Error al inicializar el estado del usuario:', error);
     }
   }
 }

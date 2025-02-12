@@ -45,6 +45,10 @@ export class MenuComponent implements OnInit, OnDestroy {
     return this.authService.isAuthenticated();
   }
 
+  isAdmin(): boolean {
+    return this.authService.isAdmin(); // Verifica si el usuario es admin
+  }
+
   logout(): void {
     this.authService.logout();
     this.cartCount = 0;

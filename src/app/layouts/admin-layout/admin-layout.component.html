@@ -1,0 +1,16 @@
+<div class="admin-container">
+  <nav class="admin-menu">
+    <h2>Panel de Administración</h2>
+    <ul>
+      <li><a routerLink="/admin/dashboard">Dashboard</a></li>
+      <li><a routerLink="/admin/usuarios">Usuarios</a></li>
+      <li><a routerLink="/admin/reportes">Reportes</a></li>
+      <li><a (click)="logout()">Cerrar Sesión</a></li>
+    </ul>
+  </nav>
+
+  <!-- 🔥 Aquí se cargarán las rutas hijas del Admin -->
+  <div class="admin-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
