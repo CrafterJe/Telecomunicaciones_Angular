@@ -1,11 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { AdminService } from '../../services/admin.service';
+import { RouterLink } from '@angular/router'; // 👈 Importar RouterLink
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [],
+  standalone: true, 
+  imports: [RouterLink],
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.css'
+  styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
+  totalUsuarios: number = 0;
+  totalProductos: number = 0;
 
+  constructor(private adminService: AdminService) {}
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.adminService.getTotalUsuarios().subscribe(data => {
+      this.totalUsuarios = data.total;
+    });
+
+    this.adminService.getTotalProductos().subscribe(data => {
+      this.totalProductos = data.total;
+    });
+  }
 }

@@ -1,1 +1,30 @@
-<p>admin-dashboard works!</p>
+<div class="container mt-4">
+  <div class="row">
+    <!-- Tarjeta: Usuarios Registrados -->
+    <div class="col-md-6">
+      <div class="card text-white bg-primary mb-3">
+        <div class="card-header">Usuarios Registrados</div>
+        <div class="card-body">
+          <h2 class="card-title">{{ totalUsuarios }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta: Productos Disponibles -->
+    <div class="col-md-6">
+      <div class="card text-white bg-warning mb-3">
+        <div class="card-header">Productos en Stock</div>
+        <div class="card-body">
+          <h2 class="card-title">{{ totalProductos }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón para ir a la gestión de usuarios -->
+  <div class="text-center mt-4">
+    <a routerLink="/admin/usuarios" class="btn btn-danger">
+      Gestionar Usuarios
+    </a>
+  </div>
+</div>

@@ -36,7 +36,7 @@ export class LoginComponent {
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        console.log('Login exitoso:', response);
+        //console.log('Login exitoso:', response);
 
         // Manejar el token y extraer datos del usuario
         const token = response.token;

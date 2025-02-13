@@ -1,16 +1,24 @@
-<div class="admin-container">
-  <nav class="admin-menu">
-    <h2>Panel de Administración</h2>
-    <ul>
-      <li><a routerLink="/admin/dashboard">Dashboard</a></li>
-      <li><a routerLink="/admin/usuarios">Usuarios</a></li>
-      <li><a routerLink="/admin/reportes">Reportes</a></li>
-      <li><a (click)="logout()">Cerrar Sesión</a></li>
-    </ul>
-  </nav>
-
-  <!-- 🔥 Aquí se cargarán las rutas hijas del Admin -->
-  <div class="admin-content">
-    <router-outlet></router-outlet>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Menú lateral -->
+    <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+      <div class="position-sticky">
+        <h2 class="text-white text-center py-3">Panel Admin</h2>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/admin/dashboard">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/admin/usuarios">Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/admin/reportes">Reportes</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <router-outlet></router-outlet>
+    </main>
   </div>
 </div>

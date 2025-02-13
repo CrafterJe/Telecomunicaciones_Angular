@@ -15,7 +15,8 @@ export class AuthService {
   private roleSubject = new BehaviorSubject<string | null>(null); // Para el rol
 
   constructor(private http: HttpClient) {
-    this.initializeUserState(); // Inicializa el estado al cargar el servicio
+    this.initializeUserState();
+    this.initializeRole(); // Inicializa el estado al cargar el servicio
   }
 
   /**
@@ -131,7 +132,32 @@ export class AuthService {
   getUserRole(): string {
     return this.getFromLocalStorage('rol') || 'usuario'; // Por defecto, usuario
   }
+  getRole$(): Observable<string | null> {
+    return this.roleSubject.asObservable();
+  }
 
+  /**
+   * Sincronizar el rol con localStorage y notificar a los componentes
+   */
+  private initializeRole(): void {
+    const rol = this.getUserRole();
+    this.roleSubject.next(rol);
+  }
+
+  /**
+   * Actualizar el rol en tiempo real (usado después de login o cambios en la BD)
+   */
+  refreshUserRole(): void {
+    this.http.get<any>(`${this.apiUrl}/auth/rol`).subscribe(
+      (response) => {
+        localStorage.setItem('rol', response.rol);
+        this.roleSubject.next(response.rol);
+      },
+      (error) => {
+        console.error('Error al obtener el rol del usuario:', error);
+      }
+    );
+  }
   /**
    * Verificar si el usuario es administrador
    */
@@ -216,4 +242,9 @@ export class AuthService {
       console.error('Error al inicializar el estado del usuario:', error);
     }
   }
+  getUserId(): string {
+    return localStorage.getItem('userId') || '';
+  }
+
+
 }
