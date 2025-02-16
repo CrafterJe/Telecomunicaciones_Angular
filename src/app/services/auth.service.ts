@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Injectable,Inject,PLATFORM_ID } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, BehaviorSubject,interval,of,throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { API_URL } from '../config/api.config';
+import { switchMap } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,9 @@ export class AuthService {
   private usernameSubject = new BehaviorSubject<string | null>(null);
   private roleSubject = new BehaviorSubject<string | null>(null); // Para el rol
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     this.initializeUserState();
     this.initializeRole(); // Inicializa el estado al cargar el servicio
   }
@@ -33,11 +36,39 @@ export class AuthService {
     }
   }
 
+  private getHeaders(): HttpHeaders {
+    const token = isPlatformBrowser(this.platformId) ? localStorage.getItem('token') : null;
+    return new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+  }
+
+  private getRolFromBackend(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/auth/rol`, { headers: this.getHeaders() }).pipe(
+      switchMap(response => {
+        if (response?.rol && response.rol !== this.getUserRole()) {
+          console.warn("⚠️ El rol ha cambiado, actualizando...");
+          this.saveToLocalStorage('rol', response.rol);
+          this.roleSubject.next(response.rol);
+        }
+        return of(response);
+      }),
+      catchError(error => {
+        console.error("❌ Error al obtener el rol:", error);
+        return of(null); // No hacer que la aplicación crashee
+      })
+    );
+  }
+  public updateRolUsuario(): void {
+    this.getRolFromBackend().subscribe();
+  }
+
+
   /**
    * Guardar datos en `localStorage` (con verificación)
    */
   private saveToLocalStorage(key: string, value: string): void {
-    if (this.isLocalStorageAvailable()) {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(key, value);
     } else {
       console.warn(`No se pudo guardar "${key}" en localStorage.`);
@@ -47,8 +78,11 @@ export class AuthService {
   /**
    * Obtener datos de `localStorage` (con verificación)
    */
-  getFromLocalStorage(key: string): string | null {
-    return this.isLocalStorageAvailable() ? localStorage.getItem(key) : null;
+  private getFromLocalStorage(key: string): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem(key);
+    }
+    return null;
   }
 
   /**
@@ -190,9 +224,13 @@ export class AuthService {
         this.saveToLocalStorage('rol', rol);
         this.roleSubject.next(rol);
       }
+
+      this.getRolFromBackend().subscribe();
+
     } catch (error) {
       console.error('Error al procesar el token en handleLogin:', error);
     }
+
   }
 
   /**
@@ -245,6 +283,5 @@ export class AuthService {
   getUserId(): string {
     return localStorage.getItem('userId') || '';
   }
-
 
 }

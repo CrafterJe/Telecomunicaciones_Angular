@@ -39,6 +39,12 @@ export class MenuComponent implements OnInit, OnDestroy {
 
     // Inicializar el carrito si es necesario
     this.initCarrito();
+
+    if (this.authService.isAuthenticated()) {
+      this.authService.updateRolUsuario();
+    } else {
+      console.warn("⚠️ Usuario no autenticado, no se verificará el rol.");
+    }
   }
 
   isAuthenticated(): boolean {
@@ -60,7 +66,7 @@ export class MenuComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const userId = this.authService.getFromLocalStorage('userId');
+    const userId = localStorage.getItem('userId');
     if (userId) {
       this.cartService.initializeCart(userId); // Sincroniza el carrito con el servidor
     } else {

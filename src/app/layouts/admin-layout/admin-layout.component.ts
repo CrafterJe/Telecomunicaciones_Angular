@@ -16,12 +16,13 @@ export class AdminLayoutComponent implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    // 🔥 Suscribirse a los cambios de rol en tiempo real
+    // Suscribirse al rol en tiempo real
     this.authService.getRole$().subscribe(rol => {
       this.isAdmin = rol === 'admin';
 
-      // 🔥 Si deja de ser admin, redirigir al home
+      // Si el usuario ya no es admin, lo redirigimos al Home
       if (!this.isAdmin) {
+        console.warn("⚠️ Ya no tienes permisos de admin. Redirigiendo...");
         this.router.navigate(['/home']);
       }
     });
