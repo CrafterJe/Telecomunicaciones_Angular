@@ -10,6 +10,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { AdminUsuariosComponent } from './admin/admin-usuarios/admin-usuarios.component';
 import { AdminReportesComponent } from './admin/admin-reportes/admin-reportes.component';
+import { AdminProductosComponent } from './admin/admin-productos/admin-productos.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
@@ -27,6 +28,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'usuarios', component: AdminUsuariosComponent },
+      { path: 'productos', component: AdminProductosComponent },
       { path: 'reportes', component: AdminReportesComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' } // Si entran a /admin, va al dashboard
     ]

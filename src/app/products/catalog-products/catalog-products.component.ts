@@ -3,25 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../services/products.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
-import { jwtDecode } from 'jwt-decode';  // Importa jwtDecode en lugar de jwt_decode
+import { jwtDecode } from 'jwt-decode';
 
 interface CustomJwtPayload {
   user_id: string;
-  // Aquí puedes agregar otras propiedades que contenga tu token, si es necesario
-}
-interface Especificaciones {
-  ram: number;
-  procesador: string;
+
 }
 
-interface Producto {
-  _id: string;
-  nombre: string;
-  tipo: string;
-  precio: number;
-  especificaciones: Especificaciones;
-  stock: number;
-}
 
 @Component({
   selector: 'app-catalog-products',
@@ -85,9 +73,4 @@ export class CatalogProductsComponent implements OnInit {
       },
     });
   }
-
-
-
-
-
 }

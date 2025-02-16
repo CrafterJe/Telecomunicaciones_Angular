@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { API_URL } from '../config/api.config';
-import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -14,14 +14,19 @@ export class AdminService {
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
+
     if (!token) {
-      console.error('❌ No hay token en localStorage');
+      console.error('❌ No hay token en localStorage. Asegúrate de haber iniciado sesión.');
+      throw new Error("No hay token disponible");
     }
+
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 
+  // 🔹 Obtener total de usuarios y productos
   getTotalUsuarios(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/usuarios/total`, { headers: this.getHeaders() });
   }
@@ -30,10 +35,12 @@ export class AdminService {
     return this.http.get<any>(`${this.apiUrl}/admin/productos/total`, { headers: this.getHeaders() });
   }
 
+  // 🔹 Obtener usuarios
   getUsuarios(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/usuarios`, { headers: this.getHeaders() });
   }
 
+  // 🔹 Actualizar rol de usuario
   actualizarRol(id: string, nuevoRol: string): Observable<any> {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -46,13 +53,36 @@ export class AdminService {
       'Content-Type': 'application/json'
     });
 
-    console.log(`📤 Enviando petición para cambiar rol: Usuario ID ${id}, Nuevo Rol: ${nuevoRol}`);
+    //console.log(`📤 Enviando petición para cambiar rol: Usuario ID ${id}, Nuevo Rol: ${nuevoRol}`);
 
     return this.http.put<any>(`${this.apiUrl}/admin/usuarios/${id}/rol`, { rol: nuevoRol }, { headers });
   }
 
-
+  // 🔹 Eliminar usuario
   deleteUsuario(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/admin/usuarios/${id}`, { headers: this.getHeaders() });
+  }
+
+  // Obtener productos
+  getProducts(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/admin/productos`, { headers: this.getHeaders() });
+  }
+
+  // Método corregido para actualizar producto
+  updateProduct(id: string, productData: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Content-Type': 'application/json'
+    });
+
+    //console.log(`📤 Enviando PUT a: ${this.apiUrl}/admin/productos/${id}`, productData);
+
+    return this.http.put<any>(`${this.apiUrl}/admin/productos/${id}`, productData, { headers });
+  }
+
+
+  // Método para eliminar producto
+  deleteProduct(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/admin/productos/${id}`, { headers: this.getHeaders() });
   }
 }

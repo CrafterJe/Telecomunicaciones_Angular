@@ -1,0 +1,58 @@
+<div class="container mt-4">
+  <h2>Manage Products</h2>
+
+  <!-- 🔍 Search Bar -->
+  <input type="text" class="form-control mb-3" placeholder="Search product..." [(ngModel)]="searchQuery" (input)="filterProducts()">
+
+  <!-- 📋 Products Table -->
+  <table class="table table-bordered mt-3">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let producto of filteredProducts">
+        <td>{{ producto.nombre }}</td>
+        <td>{{ producto.tipo }}</td>
+        <td>${{ producto.precio }}</td>
+        <td>{{ producto.stock }}</td>
+        <td>
+          <button (click)="editProduct(producto)" class="btn btn-warning">Edit</button>
+          <button (click)="deleteProduct(producto._id)" class="btn btn-danger">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ✏️ Edit Product Form -->
+  <div *ngIf="editingProduct" class="mt-4 p-3 border rounded">
+    <h4>Edit Product</h4>
+    <label>Name:</label>
+    <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.nombre">
+
+    <label>Type:</label>
+    <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.tipo">
+
+    <label>Price:</label>
+    <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.precio">
+
+    <label>Stock:</label>
+    <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.stock">
+
+    <h5>Specifications</h5>
+    <div *ngIf="editingProduct.specifications">
+      <div *ngFor="let key of getObjectKeys(editingProduct.specifications)">
+        <label>{{ key }}:</label>
+        <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.specifications[key]">
+      </div>
+    </div>
+
+    <button class="btn btn-success" (click)="saveEdit()">Save Changes</button>
+    <button class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+  </div>
+</div>

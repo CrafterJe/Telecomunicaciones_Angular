@@ -1,4 +1,3 @@
-// src/app/interfaces/producto.interface.ts
 export interface Especificaciones {
   ram: number;
   procesador: string;
@@ -11,5 +10,5 @@ export interface Producto {
   precio: number;
   especificaciones: Especificaciones;
   stock: number;
-  cantidad?: number; // Para poder usar la propiedad cantidad en el carrito
+  cantidad?: number; 
 }
