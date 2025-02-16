@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../services/products.service';
 import { CartService } from '../../services/cart.service';
@@ -7,9 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 
 interface CustomJwtPayload {
   user_id: string;
-
 }
-
 
 @Component({
   selector: 'app-catalog-products',
@@ -18,7 +16,7 @@ interface CustomJwtPayload {
   templateUrl: './catalog-products.component.html',
   styleUrls: ['./catalog-products.component.css']
 })
-export class CatalogProductsComponent implements OnInit {
+export class CatalogProductsComponent implements OnInit, OnChanges {
   productos: any[] = [];
   loading: boolean = true;
   error: string | null = null;
@@ -36,11 +34,19 @@ export class CatalogProductsComponent implements OnInit {
     // Extraer el user_id del token usando jwtDecode y el tipo personalizado
     const token = this.authService.getToken();
     if (token) {
-      const decodedToken = jwtDecode<CustomJwtPayload>(token);  // Decodificamos el token con el tipo personalizado
-      this.userId = decodedToken.user_id;  // Ahora TypeScript sabe que 'user_id' existe
+      const decodedToken = jwtDecode<CustomJwtPayload>(token);
+      this.userId = decodedToken.user_id;
     }
   }
 
+  // 🔄 Detectar cambios en la lista de productos (por si se editan en admin-productos)
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes) {
+      this.cargarProductos(); // 🔄 Recarga los productos si hay cambios
+    }
+  }
+
+  // 🔄 Cargar productos desde el backend
   cargarProductos(): void {
     this.loading = true;
     this.productsService.getProductos().subscribe({
@@ -55,7 +61,12 @@ export class CatalogProductsComponent implements OnInit {
     });
   }
 
-  // catalog-products.component.ts
+  // 🔹 Obtener las claves de las especificaciones dinámicamente
+  getObjectKeys(obj: any): string[] {
+    return obj ? Object.keys(obj) : [];
+  }
+
+  // 📦 Agregar producto al carrito
   agregarAlCarrito(productoId: string, cantidad: number): void {
     if (!this.userId) {
       alert('Inicia sesión para agregar productos al carrito');
