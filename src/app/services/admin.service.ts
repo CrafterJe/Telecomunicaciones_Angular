@@ -67,7 +67,9 @@ export class AdminService {
   getProducts(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/productos`, { headers: this.getHeaders() });
   }
-
+  addProduct(productData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/admin/productos`, productData, { headers: this.getHeaders() });
+}
   // Método corregido para actualizar producto
   updateProduct(id: string, productData: any): Observable<any> {
     const headers = new HttpHeaders({

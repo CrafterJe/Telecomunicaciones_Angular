@@ -1,6 +1,8 @@
 <div class="container mt-4">
-  <h2>Administrar Productos</h2>
-
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Administrar Productos</h2>
+    <button class="btn btn-success" (click)="openAddProductForm()">➕ Agregar Producto</button>
+  </div>
   <!-- 🔍 Search Bar -->
   <input type="text" class="form-control mb-3" placeholder="Buscar producto..." [(ngModel)]="searchQuery" (input)="filterProducts()">
 
@@ -28,6 +30,53 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- 📌 Formulario para agregar un nuevo producto -->
+  <div *ngIf="isAddingProduct" class="mt-4 p-3 border rounded">
+    <h4>Agregar Nuevo Producto</h4>
+    <label>Nombre:</label>
+    <input type="text" class="form-control mb-2" [(ngModel)]="newProduct.nombre">
+
+    <label>Tipo:</label>
+    <input type="text" class="form-control mb-2" [(ngModel)]="newProduct.tipo">
+
+    <label>Precio:</label>
+    <input type="number" class="form-control mb-2" [(ngModel)]="newProduct.precio">
+
+    <label>Stock:</label>
+    <input type="number" class="form-control mb-2" [(ngModel)]="newProduct.stock">
+
+    <h5>Especificaciones</h5>
+    <div>
+      <div *ngIf="newProduct.especificaciones">
+        <div *ngFor="let key of getObjectKeys(newProduct.especificaciones)">
+          <label>{{ key }}:</label>
+          <input type="text" class="form-control mb-2" [(ngModel)]="newProduct.especificaciones[key]">
+          <button class="btn btn-danger btn-sm" (click)="removeSpecificationFromProduct(key)">❌ Quitar</button>
+        </div>
+      </div>
+      
+      <div class="mt-3">
+        <div *ngIf="!isAddingNewSpec">
+          <select class="form-control mb-2" [(ngModel)]="selectedSpec">
+            <option value="">Selecciona una especificación existente</option>
+            <option *ngFor="let spec of availableSpecs" [value]="spec">{{ spec }}</option>
+          </select>
+          <button class="btn btn-sm btn-secondary" (click)="toggleSpecMode()">➕ Agregar nuevo nombre</button>
+        </div>
+
+        <div *ngIf="isAddingNewSpec">
+          <input type="text" class="form-control mb-2" [(ngModel)]="newSpecKey" placeholder="Ingresa el nombre de la especificación">
+          <button class="btn btn-sm btn-warning" (click)="toggleSpecMode()">🔄 Usar lista existente</button>
+        </div>
+
+        <input type="text" class="form-control mb-2" [(ngModel)]="newSpecValue" placeholder="Ingresar especificación">
+        <button class="btn btn-primary btn-sm" (click)="addSpecificationToProduct()">➕ Agregar Especificación</button>
+      </div>
+    </div>
+    <button class="btn btn-success" (click)="addProduct()">Guardar Producto</button>
+    <button class="btn btn-secondary" (click)="cancelAddProduct()">Cancelar</button>
+  </div>
 
   <!-- ✏️ Edit Product Form -->
   <div *ngIf="editingProduct" class="mt-4 p-3 border rounded">

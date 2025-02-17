@@ -52,7 +52,7 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
     this.loading = true;
     this.productsService.getProductos().subscribe({
       next: (data) => {
-        this.productos = data;
+        this.productos = data.sort((a: any, b: any) => a.nombre.localeCompare(b.nombre)); // Ordenar alfabéticamente por nombre
         this.loading = false;
       },
       error: (error) => {
@@ -61,6 +61,7 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
       }
     });
   }
+
 
   // 🔹 Obtener las claves de las especificaciones dinámicamente
   getObjectKeys(obj: any): string[] {

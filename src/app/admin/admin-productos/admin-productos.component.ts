@@ -17,6 +17,8 @@ export class AdminProductosComponent implements OnInit {
   filteredProducts: Producto[] = [];
   searchQuery: string = '';
   editingProduct: Producto | null = null;
+  isAddingProduct: boolean = false; // Controla si se está agregando un nuevo producto
+  newProduct: Producto = this.createEmptyProduct();
   newSpecKey: string = '';
   newSpecValue: string = '';
   availableSpecs: string[] = []; // Lista de especificaciones reutilizables
@@ -36,10 +38,8 @@ export class AdminProductosComponent implements OnInit {
     this.adminService.getProducts().subscribe({
       next: (data) => {
         console.log("📦 Productos recibidos desde el backend:", data);
-        this.products = data;
+        this.products = data.sort((a: Producto, b: Producto) => a.nombre.localeCompare(b.nombre)); // 🔹 Especificar el tipo Producto
         this.filteredProducts = [...this.products];
-
-        // Extraer nombres únicos de especificaciones
         this.extractAvailableSpecifications();
       },
       error: (err) => {
@@ -60,11 +60,79 @@ export class AdminProductosComponent implements OnInit {
     this.availableSpecs = Array.from(specsSet);
   }
 
+  createEmptyProduct(): Producto {
+    return {
+      _id: '',
+      nombre: '',
+      tipo: '',
+      precio: 0,
+      stock: 0,
+      especificaciones: {}
+    };
+  }
+
+  openAddProductForm(): void {
+    this.isAddingProduct = true;
+    this.newProduct = this.createEmptyProduct();
+  }
+
+  cancelAddProduct(): void {
+    this.isAddingProduct = false;
+  }
+
+  addProduct(): void {
+    if (!this.newProduct.nombre.trim() || !this.newProduct.tipo.trim()) {
+      alert('Por favor ingresa un nombre y tipo para el producto.');
+      return;
+    }
+
+    this.adminService.addProduct(this.newProduct).subscribe(() => {
+      this.loadProducts();
+      this.isAddingProduct = false;
+    });
+  }
+
   toggleSpecMode(): void {
     this.isAddingNewSpec = !this.isAddingNewSpec;
     this.newSpecKey = ''; // Limpiar input si cambia de modo
     this.selectedSpec = ''; // Limpiar dropdown si cambia de modo
   }
+
+  addSpecificationToProduct(): void {
+    let specKey = this.isAddingNewSpec ? this.newSpecKey.trim() : this.selectedSpec;
+
+    if (!specKey || !this.newSpecValue.trim()) {
+      alert('Por favor ingresa un nombre y valor para la especificación.');
+      return;
+    }
+
+    if (!this.newProduct.especificaciones) {
+      this.newProduct.especificaciones = {};
+    }
+
+    if (this.newProduct.especificaciones.hasOwnProperty(specKey)) {
+      alert(`La especificación "${specKey}" ya está agregada a este producto.`);
+      return;
+    }
+
+    this.newProduct.especificaciones[specKey] = this.newSpecValue.trim();
+
+    if (!this.availableSpecs.includes(specKey)) {
+      this.availableSpecs.push(specKey);
+    }
+
+    this.newSpecKey = '';
+    this.selectedSpec = '';
+    this.newSpecValue = '';
+    this.isAddingNewSpec = false;
+  }
+
+  removeSpecificationFromProduct(key: string): void {
+    if (this.newProduct?.especificaciones) {
+      delete this.newProduct.especificaciones[key];
+    }
+  }
+
 
   openDeleteModal(productId: string): void {
     this.productToDeleteId = productId;
@@ -105,9 +173,9 @@ export class AdminProductosComponent implements OnInit {
   }
 
   filterProducts(): void {
-    this.filteredProducts = this.products.filter(product =>
-      product.nombre.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+    this.filteredProducts = this.products
+      .filter(product => product.nombre.toLowerCase().includes(this.searchQuery.toLowerCase()))
+      .sort((a: Producto, b: Producto) => a.nombre.localeCompare(b.nombre)); // Especificar tipo Producto
   }
 
   getObjectKeys(obj: any): string[] {
