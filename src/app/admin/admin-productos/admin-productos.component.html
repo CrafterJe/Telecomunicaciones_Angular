@@ -1,8 +1,8 @@
 <div class="container mt-4">
-  <h2>Manage Products</h2>
+  <h2>Administrar Productos</h2>
 
   <!-- 🔍 Search Bar -->
-  <input type="text" class="form-control mb-3" placeholder="Search product..." [(ngModel)]="searchQuery" (input)="filterProducts()">
+  <input type="text" class="form-control mb-3" placeholder="Buscar producto..." [(ngModel)]="searchQuery" (input)="filterProducts()">
 
   <!-- 📋 Products Table -->
   <table class="table table-bordered mt-3">
@@ -22,8 +22,8 @@
         <td>${{ producto.precio }}</td>
         <td>{{ producto.stock }}</td>
         <td>
-          <button (click)="editProduct(producto)" class="btn btn-warning">Edit</button>
-          <button (click)="deleteProduct(producto._id)" class="btn btn-danger">Delete</button>
+          <button (click)="editProduct(producto)" class="btn btn-warning">Editar</button>
+          <button (click)="deleteProduct(producto._id)" class="btn btn-danger">Eliminar</button>
         </td>
       </tr>
     </tbody>
@@ -31,7 +31,7 @@
 
   <!-- ✏️ Edit Product Form -->
   <div *ngIf="editingProduct" class="mt-4 p-3 border rounded">
-    <h4>EditarProductos </h4>
+    <h4>Editar Producto</h4>
     <label>Nombre:</label>
     <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.nombre">
 
@@ -49,19 +49,33 @@
       <div *ngFor="let key of getObjectKeys(editingProduct.especificaciones)">
         <label>{{ key }}:</label>
         <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.especificaciones[key]">
-        <button class="btn btn-danger btn-sm" (click)="removeSpecification(key)">❌ Remove</button>
+        <button class="btn btn-danger btn-sm" (click)="removeSpecification(key)">❌ Quitar</button>
       </div>
 
-      <!-- 🆕 Agregar nueva especificación -->
+      <!-- 🆕 Agregar nueva especificación con dropdown -->
       <div class="mt-3">
-        <input type="text" class="form-control mb-2" [(ngModel)]="newSpecKey" placeholder="Ingresar nombre de la especificación">
+        <!-- Dropdown de especificaciones existentes (solo si no está en modo agregar nueva) -->
+        <div *ngIf="!isAddingNewSpec">
+          <select class="form-control mb-2" [(ngModel)]="selectedSpec">
+            <option value="">Selecciona una especificación existente</option>
+            <option *ngFor="let spec of availableSpecs" [value]="spec">{{ spec }}</option>
+          </select>
+          <button class="btn btn-sm btn-secondary" (click)="toggleSpecMode()">➕ Agregar nuevo nombre</button>
+        </div>
+
+        <!-- Input para nueva especificación (solo si está en modo agregar nueva) -->
+        <div *ngIf="isAddingNewSpec">
+          <input type="text" class="form-control mb-2" [(ngModel)]="newSpecKey" placeholder="Ingresa el nombre de la especificación">
+          <button class="btn btn-sm btn-warning" (click)="toggleSpecMode()">🔄 Usar lista existente</button>
+        </div>
+
+        <!-- Input de valor de especificación -->
         <input type="text" class="form-control mb-2" [(ngModel)]="newSpecValue" placeholder="Ingresar especificación">
-        <button class="btn btn-primary btn-sm" (click)="addSpecification()">➕ Add Specification</button>
+        <button class="btn btn-primary btn-sm" (click)="addSpecification()">➕ Agregar Especificación</button>
       </div>
     </div>
 
-
-    <button class="btn btn-success" (click)="saveEdit()">Save Changes</button>
-    <button class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+    <button class="btn btn-success" (click)="saveEdit()">Guardar Cambios</button>
+    <button class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
   </div>
 </div>

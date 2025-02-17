@@ -4,6 +4,7 @@ import { ProductsService } from '../../services/products.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { jwtDecode } from 'jwt-decode';
+import { CapitalizePipe } from '../../capitalize/capitalize.pipe';
 
 interface CustomJwtPayload {
   user_id: string;
@@ -12,7 +13,7 @@ interface CustomJwtPayload {
 @Component({
   selector: 'app-catalog-products',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,CapitalizePipe],
   templateUrl: './catalog-products.component.html',
   styleUrls: ['./catalog-products.component.css']
 })

@@ -19,6 +19,9 @@ export class AdminProductosComponent implements OnInit {
   editingProduct: Producto | null = null;
   newSpecKey: string = '';
   newSpecValue: string = '';
+  availableSpecs: string[] = []; // Lista de especificaciones reutilizables
+  selectedSpec: string = '';
+  isAddingNewSpec: boolean = false;
 
   constructor(private adminService: AdminService) {}
 
@@ -32,6 +35,9 @@ export class AdminProductosComponent implements OnInit {
         console.log("📦 Productos recibidos desde el backend:", data);
         this.products = data;
         this.filteredProducts = [...this.products];
+
+        // Extraer nombres únicos de especificaciones
+        this.extractAvailableSpecifications();
       },
       error: (err) => {
         console.error("❌ Error al obtener productos:", err);
@@ -39,6 +45,22 @@ export class AdminProductosComponent implements OnInit {
         this.filteredProducts = [];
       }
     });
+  }
+
+  extractAvailableSpecifications(): void {
+    const specsSet = new Set<string>();
+    this.products.forEach(product => {
+      if (product.especificaciones) {
+        Object.keys(product.especificaciones).forEach(spec => specsSet.add(spec));
+      }
+    });
+    this.availableSpecs = Array.from(specsSet);
+  }
+
+  toggleSpecMode(): void {
+    this.isAddingNewSpec = !this.isAddingNewSpec;
+    this.newSpecKey = ''; // Limpiar input si cambia de modo
+    this.selectedSpec = ''; // Limpiar dropdown si cambia de modo
   }
 
   filterProducts(): void {
@@ -86,24 +108,36 @@ export class AdminProductosComponent implements OnInit {
   }
 
   addSpecification(): void {
-    if (!this.newSpecKey.trim() || !this.newSpecValue.trim()) {
-      alert('Ingresa un nombre y la especificacion.');
+    if (!this.editingProduct) return;
+
+    let specKey = this.isAddingNewSpec ? this.newSpecKey.trim() : this.selectedSpec; // Usa el dropdown o el input manual
+
+    if (!specKey || !this.newSpecValue.trim()) {
+      alert('Por favor ingresa un nombre y valor para la especificación.');
       return;
     }
 
-    if (this.editingProduct) { // Validación para evitar errores de null
-      if (!this.editingProduct.especificaciones) {
-        this.editingProduct.especificaciones = {};
-      }
-
-      // Agregar la nueva especificación
-      this.editingProduct.especificaciones[this.newSpecKey] = this.newSpecValue;
-
-      // Limpiar los inputs
-      this.newSpecKey = '';
-      this.newSpecValue = '';
+    if (!this.editingProduct.especificaciones) {
+      this.editingProduct.especificaciones = {};
     }
+
+    if (this.editingProduct.especificaciones.hasOwnProperty(specKey)) {
+      alert(`La especificación "${specKey}" ya está agregada a este producto.`);
+      return;
+    }
+
+    this.editingProduct.especificaciones[specKey] = this.newSpecValue.trim();
+
+    if (!this.availableSpecs.includes(specKey)) {
+      this.availableSpecs.push(specKey);
+    }
+
+    this.newSpecKey = '';
+    this.selectedSpec = '';
+    this.newSpecValue = '';
+    this.isAddingNewSpec = false; // Resetear modo después de agregar
   }
+
 
   removeSpecification(key: string): void {
     if (this.editingProduct?.especificaciones) { // Validación para evitar errores
