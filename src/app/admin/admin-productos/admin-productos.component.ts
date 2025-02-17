@@ -22,6 +22,9 @@ export class AdminProductosComponent implements OnInit {
   availableSpecs: string[] = []; // Lista de especificaciones reutilizables
   selectedSpec: string = '';
   isAddingNewSpec: boolean = false;
+  showDeleteModal: boolean = false;  // Estado del modal de eliminación
+  showSaveModal: boolean = false;    // Estado del modal de guardar cambios
+  productToDeleteId: string | null = null;
 
   constructor(private adminService: AdminService) {}
 
@@ -61,6 +64,44 @@ export class AdminProductosComponent implements OnInit {
     this.isAddingNewSpec = !this.isAddingNewSpec;
     this.newSpecKey = ''; // Limpiar input si cambia de modo
     this.selectedSpec = ''; // Limpiar dropdown si cambia de modo
+  }
+
+  openDeleteModal(productId: string): void {
+    this.productToDeleteId = productId;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (this.productToDeleteId) {
+      this.adminService.deleteProduct(this.productToDeleteId).subscribe(() => {
+        this.loadProducts();
+        this.showDeleteModal = false;
+        this.productToDeleteId = null;
+      });
+    }
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.productToDeleteId = null;
+  }
+
+  openSaveModal(): void {
+    this.showSaveModal = true;
+  }
+
+  confirmSave(): void {
+    if (!this.editingProduct) return;
+
+    this.adminService.updateProduct(this.editingProduct._id, this.editingProduct).subscribe(() => {
+      this.loadProducts();
+      this.editingProduct = null;
+      this.showSaveModal = false;
+    });
+  }
+
+  cancelSave(): void {
+    this.showSaveModal = false;
   }
 
   filterProducts(): void {
