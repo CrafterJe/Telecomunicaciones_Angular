@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AdminService } from '../../services/admin.service';
-import { RouterLink } from '@angular/router'; // 👈 Importar RouterLink
+import { RouterLink } from '@angular/router'; // Importar RouterLink para que funcone boton 'Gestionar Usuarios'
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: true, 
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']

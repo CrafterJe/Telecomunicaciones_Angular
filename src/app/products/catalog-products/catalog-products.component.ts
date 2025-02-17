@@ -47,7 +47,7 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
     }
   }
 
-  // 🔄 Cargar productos desde el backend
+  // Cargar productos desde el backend
   cargarProductos(): void {
     this.loading = true;
     this.productsService.getProductos().subscribe({
@@ -63,7 +63,7 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
   }
 
 
-  // 🔹 Obtener las claves de las especificaciones dinámicamente
+  // Obtener las claves de las especificaciones dinámicamente
   getObjectKeys(obj: any): string[] {
     return obj ? Object.keys(obj) : [];
   }

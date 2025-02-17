@@ -11,6 +11,12 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 import { AdminUsuariosComponent } from './admin/admin-usuarios/admin-usuarios.component';
 import { AdminReportesComponent } from './admin/admin-reportes/admin-reportes.component';
 import { AdminProductosComponent } from './admin/admin-productos/admin-productos.component';
+import { PaymentComponent } from './payment/payment.component';
+import { AccountLayoutComponent } from './layouts/account-layout/account-layout.component';
+import { AccountComponent } from './account/account/account.component';
+import { ConfigComponent } from './account/config/config.component';
+import { ProfileComponent } from './account/profile/profile.component';
+import { AddressesComponent } from './account/addresses/addresses.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'Home', pathMatch: 'full' },
@@ -19,6 +25,7 @@ export const routes: Routes = [
   { path: 'cart', component: CartComponent },
   { path: 'login', component: LoginComponent},
   { path: 'register', component: RegisterComponent},
+  { path: 'payment', component: PaymentComponent},
 
 
   {
@@ -31,6 +38,17 @@ export const routes: Routes = [
       { path: 'productos', component: AdminProductosComponent },
       { path: 'reportes', component: AdminReportesComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' } // Si entran a /admin, va al dashboard
+    ]
+  },
+  {
+    path : 'account',
+    component : AccountLayoutComponent,
+    children: [
+      { path : 'account' , component: AccountComponent},
+      { path : 'config' , component: ConfigComponent},
+      { path : 'profile' , component: ProfileComponent},
+      { path : 'addresses' , component: AddressesComponent},
+      { path : '', redirectTo: 'profile', pathMatch: 'full' } // si entran va  a /account
     ]
   }
 ];
