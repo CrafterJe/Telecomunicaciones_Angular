@@ -1,0 +1,44 @@
+body {
+  background-color: lightblue;
+}
+
+#form-wrapper {
+  background-color: white;
+  margin: auto;
+  margin-top: 100px;
+  width: 600px;
+  height: auto;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid lightgray;
+}
+
+#header {
+  background-color: #ac16d1;
+  border-radius: 10px 10px 0px 0px;
+  border: rgb(255, 255, 255) solid 1px;
+}
+
+h1 {
+  color: #ffffff;
+}
+
+h5 {
+  color: #000000;
+}
+
+button i {
+  color: white;
+}
+
+hr {
+  border-color: #000000;
+}
+
+button {
+  background-color: #ac16d1 !important;
+}
+
+select {
+  display: inline;
+}
