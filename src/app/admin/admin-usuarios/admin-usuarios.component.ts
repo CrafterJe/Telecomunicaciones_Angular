@@ -46,9 +46,20 @@ export class AdminUsuariosComponent implements OnInit {
     }
 
     if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-      this.adminService.deleteUsuario(id).subscribe(() => {
-        this.usuarios = this.usuarios.filter(u => u._id !== id);
+      console.log(`🔄 Intentando eliminar usuario`);
+
+      this.adminService.deleteUsuario(id).subscribe({
+        next: () => {
+          alert(`✅ Usuario eliminado correctamente`);
+          this.usuarios = this.usuarios.filter(u => u._id !== id);
+        },
+        error: (error) => {
+          console.error("❌ Error al eliminar usuario:", error);
+          alert("Hubo un problema al eliminar el usuario.");
+        }
       });
     }
   }
+
+
 }

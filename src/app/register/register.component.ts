@@ -31,7 +31,7 @@ export class RegisterComponent {
     // Llamada al servicio de registro
     this.authService.register(user).subscribe({
       next: (data) => {
-        console.log('Usuario registrado exitosamente');
+        alert('Usuario registrado exitosamente');
         this.router.navigate(['/login']);  // Redirigir al login
       },
       error: (err) => {

@@ -58,9 +58,32 @@ export class AdminService {
     return this.http.put<any>(`${this.apiUrl}/admin/usuarios/${id}/rol`, { rol: nuevoRol }, { headers });
   }
 
-  // 🔹 Eliminar usuario
+  // Eliminar usuario
   deleteUsuario(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/admin/usuarios/${id}`, { headers: this.getHeaders() });
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      console.error('❌ No hay token en localStorage. Asegúrate de haber iniciado sesión.');
+      alert("Error: No hay token disponible. Inicia sesión nuevamente.");
+      return throwError(() => new Error("No hay token disponible"));
+    }
+
+    console.log(`🔑 Token enviado en DELETE`);
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    /*console.log(`📤 Enviando DELETE a: ${this.apiUrl}/admin/usuarios/${id}`);*/
+
+    return this.http.delete<any>(`${this.apiUrl}/admin/usuarios/${id}`, { headers }).pipe(
+      catchError((error) => {
+        console.error("❌ Error al eliminar usuario:", error);
+        alert("Hubo un problema al eliminar el usuario. Revisa la consola.");
+        return throwError(() => new Error("Error al eliminar usuario"));
+      })
+    );
   }
 
   // Obtener productos
