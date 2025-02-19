@@ -99,4 +99,9 @@ export class CartService {
   getCarrito$(): Observable<any> {
     return this.carritoSubject.asObservable();
   }
+
+  resetCart(): void {
+    console.log("🛒 Carrito reseteado.");
+    this.carritoSubject.next({ productos: [] }); // Notificar que el carrito está vacío
+  }
 }

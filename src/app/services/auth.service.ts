@@ -7,6 +7,7 @@ import { API_URL } from '../config/api.config';
 import { switchMap } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
+import { CartService } from './cart.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class AuthService {
 
   constructor(private http: HttpClient,
     private router: Router,
+    private cartService: CartService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initializeUserState();
@@ -276,7 +278,7 @@ export class AuthService {
     this.removeFromLocalStorage('username');
     this.removeFromLocalStorage('userId');
     this.removeFromLocalStorage('rol');
-
+    this.removeFromLocalStorage('carrito');
     this.usernameSubject.next(null);
     this.roleSubject.next(null);
 }
@@ -289,8 +291,11 @@ logout(): void {
 
 logoutExpiredSession(): void {
   this.clearSession();
+  this.cartService.resetCart();
   console.warn("⚠️ Sesión expirada. Redirigiendo a Login...");
-  this.router.navigate(['/login']);
+  this.router.navigate(['/login']).then(() => {
+    console.log("🔄 Redireccionando...");
+});
 }
 
 

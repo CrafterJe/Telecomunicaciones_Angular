@@ -30,14 +30,19 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
   return next(clonedRequest).pipe(
     tap({
       error: (err) => {
-        if ((err.status === 403 || (err.status === 401 && token)) && !sessionExpiredHandled) {
-          sessionExpiredHandled = true;
+        const isLoginRequest = req.url.includes('/login'); // Detectar si es la petición de login
+
+        if (!isLoginRequest && (err.status === 403 || err.status === 401) && !sessionExpiredHandled) {
+          sessionExpiredHandled = true; // Evitar que se ejecute más de una vez
 
           alert('⚠️ Tu sesión ha expirado. Inicia sesión nuevamente.');
 
-          authService.logout();  // Llamar logout para limpiar sesión
+          authService.logoutExpiredSession();  // Llamar logout específico para token expirado
+
           router.navigate(['/login']).then(() => {
-            sessionExpiredHandled = false; // Permitir futuras redirecciones después del login
+            setTimeout(() => {
+              sessionExpiredHandled = false; // Resetear después de que el usuario vuelva a login
+            }, 500);
           });
         }
       }
