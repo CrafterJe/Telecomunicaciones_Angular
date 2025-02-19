@@ -31,14 +31,27 @@
     </tbody>
   </table>
 
-  <!-- 📌 Formulario para agregar un nuevo producto -->
-  <div *ngIf="isAddingProduct" class="mt-4 p-3 border rounded">
+  <!-- Formulario para agregar un nuevo producto -->
+  <div *ngIf="isAddingProduct && !isEditingProduct" class="mt-4 p-3 border rounded">
     <h4>Agregar Nuevo Producto</h4>
     <label>Nombre:</label>
     <input type="text" class="form-control mb-2" [(ngModel)]="newProduct.nombre">
 
     <label>Tipo:</label>
-    <input type="text" class="form-control mb-2" [(ngModel)]="newProduct.tipo">
+    <!-- 🔹 Modo de Selección -->
+    <div *ngIf="!isAddingNewType">
+      <select class="form-control mb-2" [(ngModel)]="newProduct.tipo">
+        <option value="">Selecciona un tipo existente</option>
+        <option *ngFor="let tipo of availableTypes" [value]="tipo">{{ tipo }}</option>
+      </select>
+      <button class="btn btn-sm btn-secondary" (click)="toggleTypeMode()">➕ Agregar nuevo tipo</button>
+    </div>
+
+    <!-- 🔹 Modo de Entrada Manual -->
+    <div *ngIf="isAddingNewType">
+      <input type="text" class="form-control mb-2" [(ngModel)]="newProduct.tipo" placeholder="Ingresa un nuevo tipo">
+      <button class="btn btn-sm btn-warning" (click)="toggleTypeMode()">🔄 Usar lista existente</button>
+    </div>
 
     <label>Precio:</label>
     <input type="number" class="form-control mb-2" [(ngModel)]="newProduct.precio">
@@ -55,7 +68,7 @@
           <button class="btn btn-danger btn-sm" (click)="removeSpecificationFromProduct(key)">❌ Quitar</button>
         </div>
       </div>
-      
+
       <div class="mt-3">
         <div *ngIf="!isAddingNewSpec">
           <select class="form-control mb-2" [(ngModel)]="selectedSpec">
@@ -78,14 +91,28 @@
     <button class="btn btn-secondary" (click)="cancelAddProduct()">Cancelar</button>
   </div>
 
-  <!-- ✏️ Edit Product Form -->
-  <div *ngIf="editingProduct" class="mt-4 p-3 border rounded">
+  <!-- Formulario para editar un producto -->
+  <div *ngIf="isEditingProduct && !isAddingProduct && editingProduct">
     <h4>Editar Producto</h4>
     <label>Nombre:</label>
     <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.nombre">
 
     <label>Tipo:</label>
-    <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.tipo">
+    <!-- 🔹 Modo de Selección -->
+    <div *ngIf="!isAddingNewTypeEdit">
+      <select class="form-control mb-2" [(ngModel)]="editingProduct.tipo">
+        <option value="">Selecciona un tipo existente</option>
+        <option *ngFor="let tipo of availableTypes" [value]="tipo">{{ tipo }}</option>
+      </select>
+      <button class="btn btn-sm btn-secondary" (click)="toggleTypeModeEdit()">➕ Agregar nuevo tipo</button>
+    </div>
+
+    <!-- 🔹 Modo de Entrada Manual -->
+    <div *ngIf="isAddingNewTypeEdit">
+      <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct.tipo" placeholder="Ingresa un nuevo tipo">
+      <button class="btn btn-sm btn-warning" (click)="toggleTypeModeEdit()">🔄 Usar lista existente</button>
+    </div>
+
 
     <label>Precio:</label>
     <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.precio">
@@ -125,7 +152,7 @@
   </div>
 </div>
 
-<!-- 🗑️ Modal de Confirmación para Eliminar -->
+<!-- Modal de Confirmación para Eliminar -->
 <div *ngIf="showDeleteModal" class="modal-backdrop">
   <div class="modal-content">
     <h3>¿Estás seguro de eliminar este producto?</h3>
@@ -135,7 +162,7 @@
   </div>
 </div>
 
-<!-- 💾 Modal de Confirmación para Guardar -->
+<!-- Modal de Confirmación para Guardar -->
 <div *ngIf="showSaveModal" class="modal-backdrop">
   <div class="modal-content">
     <h3>¿Guardar cambios?</h3>

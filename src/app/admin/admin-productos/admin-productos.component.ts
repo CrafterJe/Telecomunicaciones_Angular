@@ -17,6 +17,7 @@ export class AdminProductosComponent implements OnInit {
   filteredProducts: Producto[] = [];
   searchQuery: string = '';
   editingProduct: Producto | null = null;
+  isEditingProduct: boolean = false; //Controla si se esta editando un nuevo producto
   isAddingProduct: boolean = false; // Controla si se está agregando un nuevo producto
   newProduct: Producto = this.createEmptyProduct();
   newSpecKey: string = '';
@@ -27,6 +28,11 @@ export class AdminProductosComponent implements OnInit {
   showDeleteModal: boolean = false;  // Estado del modal de eliminación
   showSaveModal: boolean = false;    // Estado del modal de guardar cambios
   productToDeleteId: string | null = null;
+  availableTypes: string[] = [];
+  selectedType: string = '';
+  isAddingNewType: boolean = false; // Controla si se usa un dropdown o un input
+  isAddingNewTypeEdit: boolean = false;
+  selectedTypeEdit: string = '';
 
   constructor(private adminService: AdminService) {}
 
@@ -38,8 +44,9 @@ export class AdminProductosComponent implements OnInit {
     this.adminService.getProducts().subscribe({
       next: (data) => {
         console.log("📦 Productos recibidos desde el backend:", data);
-        this.products = data.sort((a: Producto, b: Producto) => a.nombre.localeCompare(b.nombre)); // 🔹 Especificar el tipo Producto
+        this.products = data.sort((a: Producto, b: Producto) => a.nombre.localeCompare(b.nombre));
         this.filteredProducts = [...this.products];
+        this.extractAvailableTypes();
         this.extractAvailableSpecifications();
       },
       error: (err) => {
@@ -48,6 +55,37 @@ export class AdminProductosComponent implements OnInit {
         this.filteredProducts = [];
       }
     });
+  }
+
+
+  extractAvailableTypes(): void {
+    const typeSet = new Set<string>();
+    this.products.forEach(product => {
+      if (product.tipo && product.tipo.trim() !== "") {
+        typeSet.add(product.tipo.trim());
+      }
+    });
+    this.availableTypes = Array.from(typeSet);
+    console.log("📌 Tipos de productos disponibles:", this.availableTypes); // 🔹 Verifica en consola
+  }
+
+
+  toggleTypeMode(): void {
+    this.isAddingNewType = !this.isAddingNewType;
+    if (this.isAddingNewType) {
+      this.newProduct.tipo = ''; // Limpiar si cambia al modo manual
+    } else {
+      this.newProduct.tipo = this.selectedType;
+    }
+  }
+
+  toggleTypeModeEdit(): void {
+    this.isAddingNewTypeEdit = !this.isAddingNewTypeEdit;
+    if (this.isAddingNewTypeEdit) {
+      this.editingProduct!.tipo = ''; // Limpiar si cambia al modo manual
+    } else {
+      this.editingProduct!.tipo = this.selectedTypeEdit;
+    }
   }
 
   extractAvailableSpecifications(): void {
@@ -73,6 +111,8 @@ export class AdminProductosComponent implements OnInit {
 
   openAddProductForm(): void {
     this.isAddingProduct = true;
+    this.isEditingProduct = false;  // Asegurar que si se abre este, el otro se cierre
+    this.editingProduct = null;  // Limpiar cualquier edición en curso
     this.newProduct = this.createEmptyProduct();
   }
 
@@ -165,6 +205,7 @@ export class AdminProductosComponent implements OnInit {
       this.loadProducts();
       this.editingProduct = null;
       this.showSaveModal = false;
+
     });
   }
 
@@ -187,9 +228,12 @@ export class AdminProductosComponent implements OnInit {
       ...producto,
       especificaciones: producto.especificaciones || {} // Asegura que nunca sea undefined
     };
+    this.isEditingProduct = true;
+    this.isAddingProduct = false;
   }
 
   cancelEdit(): void {
+    this.isEditingProduct = false;
     this.editingProduct = null;
   }
 
@@ -198,14 +242,11 @@ export class AdminProductosComponent implements OnInit {
 
     this.adminService.updateProduct(this.editingProduct._id, this.editingProduct).subscribe(() => {
       this.loadProducts();
+      this.isEditingProduct = false; // 🔹 Cierra el formulario de edición
       this.editingProduct = null;
-
-      // Recargar productos en catalog-products después de la edición
-      this.adminService.getProducts().subscribe(products => {
-        this.products = products;
-      });
     });
-  }
+}
+
 
 
   deleteProduct(id: string): void {

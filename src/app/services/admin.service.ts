@@ -26,7 +26,7 @@ export class AdminService {
     });
   }
 
-  // 🔹 Obtener total de usuarios y productos
+  // Obtener total de usuarios y productos
   getTotalUsuarios(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/usuarios/total`, { headers: this.getHeaders() });
   }
@@ -35,12 +35,12 @@ export class AdminService {
     return this.http.get<any>(`${this.apiUrl}/admin/productos/total`, { headers: this.getHeaders() });
   }
 
-  // 🔹 Obtener usuarios
+  // Obtener usuarios
   getUsuarios(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/usuarios`, { headers: this.getHeaders() });
   }
 
-  // 🔹 Actualizar rol de usuario
+  // Actualizar rol de usuario
   actualizarRol(id: string, nuevoRol: string): Observable<any> {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -53,7 +53,7 @@ export class AdminService {
       'Content-Type': 'application/json'
     });
 
-    //console.log(`📤 Enviando petición para cambiar rol: Usuario ID ${id}, Nuevo Rol: ${nuevoRol}`);
+    //console.log(`Enviando petición para cambiar rol: Usuario ID ${id}, Nuevo Rol: ${nuevoRol}`);
 
     return this.http.put<any>(`${this.apiUrl}/admin/usuarios/${id}/rol`, { rol: nuevoRol }, { headers });
   }
@@ -75,7 +75,7 @@ export class AdminService {
       'Content-Type': 'application/json'
     });
 
-    /*console.log(`📤 Enviando DELETE a: ${this.apiUrl}/admin/usuarios/${id}`);*/
+    /*console.log(`Enviando DELETE a: ${this.apiUrl}/admin/usuarios/${id}`);*/
 
     return this.http.delete<any>(`${this.apiUrl}/admin/usuarios/${id}`, { headers }).pipe(
       catchError((error) => {

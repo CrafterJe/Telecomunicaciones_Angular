@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import { API_URL } from '../config/api.config';
 import { switchMap } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -16,11 +17,40 @@ export class AuthService {
   private roleSubject = new BehaviorSubject<string | null>(null); // Para el rol
 
   constructor(private http: HttpClient,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initializeUserState();
     this.initializeRole(); // Inicializa el estado al cargar el servicio
   }
+
+  isTokenExpired(): boolean {
+    if (typeof localStorage === 'undefined') {
+      return true; // Si localStorage no está disponible, asumir que el token ha expirado
+    }
+
+    const token = this.getToken();
+    if (!token) {
+      return true; // No hay token, así que está "expirado"
+    }
+
+    try {
+      const decodedToken: any = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (decodedToken.exp < currentTime) {
+        console.warn("⚠️ Token expirado, eliminando...");
+        this.logout();  // Eliminar el token al instante
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("❌ Error al decodificar el token:", error);
+      this.logout();  // Si hay error en el token, también eliminarlo
+      return true;
+    }
+  }
+
 
   /**
    * Verificar si `localStorage` está disponible
@@ -131,8 +161,12 @@ export class AuthService {
    * Obtener el token almacenado
    */
   getToken(): string | null {
-    return this.getFromLocalStorage('token');
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
+
 
   /**
    * Decodificar el token JWT
@@ -236,16 +270,44 @@ export class AuthService {
   /**
    * Cerrar sesión y limpiar el estado
    */
-  logout(): void {
+
+  private clearSession(): void {
     this.removeFromLocalStorage('token');
     this.removeFromLocalStorage('username');
     this.removeFromLocalStorage('userId');
-    this.removeFromLocalStorage('rol'); // Eliminamos el rol
+    this.removeFromLocalStorage('rol');
 
     this.usernameSubject.next(null);
     this.roleSubject.next(null);
-    window.location.href = '/Home';
+}
+
+logout(): void {
+  this.clearSession();
+  console.log("🔴 Sesión cerrada. Redirigiendo a Home...");
+  this.router.navigate(['/Home']);
+}
+
+logoutExpiredSession(): void {
+  this.clearSession();
+  console.warn("⚠️ Sesión expirada. Redirigiendo a Login...");
+  this.router.navigate(['/login']);
+}
+
+
+  checkTokenExpiration(): void {
+    if (!isPlatformBrowser(this.platformId)) return; // Evita ejecutar en SSR
+
+    const token = this.getToken();
+    if (!token) return;
+
+    if (this.isTokenExpired()) {
+      if (typeof alert !== 'undefined') {
+        alert('⚠️ Tu sesión ha expirado. Inicia sesión nuevamente.');
+      }
+      this.logoutExpiredSession();
+    }
   }
+
 
   /**
    * Inicializar el `username` y `rol` desde el token o `localStorage`
