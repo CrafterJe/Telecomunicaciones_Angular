@@ -1,10 +1,12 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../services/products.service';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { CapitalizePipe } from '../../capitalize/capitalize.pipe';
+
+declare const bootstrap: any; // Importación de Bootstrap para modales
 
 interface CustomJwtPayload {
   user_id: string;
@@ -22,6 +24,8 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
   loading: boolean = true;
   error: string | null = null;
   userId: string | null = null;
+  productoSeleccionado: any = null;
+  modalInstance: any;
 
   constructor(
     private productsService: ProductsService,
@@ -86,4 +90,37 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
       },
     });
   }
+
+  getImageUrl(productId: string): string {
+    const imageUrl = this.productsService.getProductImage(productId);
+
+    return imageUrl;
+  }
+
+
+  abrirModal(producto: any): void {
+    this.productoSeleccionado = producto;
+
+    const modalElement = document.querySelector('.custom-bootstrap-modal');
+    if (modalElement) {
+      this.modalInstance = new bootstrap.Modal(modalElement, {
+        backdrop: 'static', // Evita que se cierre al hacer clic fuera del modal
+        keyboard: true // Permite cerrar con la tecla ESC
+      });
+      this.modalInstance.show();
+
+      // Bootstrap maneja automáticamente el scroll del fondo
+    }
+  }
+
+  cerrarModal(): void {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
+    this.productoSeleccionado = null;
+
+    // Bootstrap restaura automáticamente el scroll
+  }
+
+
 }

@@ -205,3 +205,133 @@ button[disabled] {
         padding: 0.5rem 1rem;
     }
 }
+
+/* Alineación de la imagen a la derecha */
+.product-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.product-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Modal personalizado */
+.custom-bootstrap-modal {
+  backdrop-filter: blur(8px); /* Difuminado más sutil */
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1050;
+}
+
+/* Animación suave al abrir el modal */
+.custom-bootstrap-modal.show {
+  opacity: 1;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tamaño del modal en escritorio */
+.modal-dialog {
+  max-width: 70%; /* Ahora ocupará solo el 70% de la pantalla en PCs */
+  margin: auto;
+}
+
+/* Tamaño en tablets */
+@media (max-width: 992px) {
+  .modal-dialog {
+    max-width: 85%;
+  }
+}
+
+/* Tamaño en móviles */
+@media (max-width: 576px) {
+  .modal-dialog {
+    max-width: 95%;
+    margin: 1rem;
+  }
+
+  .modal-image {
+    max-height: 65vh;
+  }
+}
+
+/* Imagen dentro del modal */
+.modal-image {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 10px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Zoom suave en hover para pantallas grandes */
+@media (min-width: 768px) {
+  .modal-image:hover {
+    transform: scale(1.05); /* Menos exagerado */
+  }
+}
+
+/* Botón de cierre mejorado */
+.btn-close {
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.btn-close:hover {
+  transform: scale(1.2);
+}
+
+/* Bloquear el scroll de fondo usando la clase que Bootstrap maneja por defecto */
+body.modal-open {
+  overflow: hidden !important;  /* Evita el desplazamiento del fondo */
+}
+
+.custom-close-btn {
+  background-color: #ff4d4f;  /* Fondo rojo */
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;  /* Botón circular */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/*  x centrada */
+.close-icon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  transition: color 0.2s ease-in-out;
+}
+
+.custom-close-btn:hover .close-icon {
+  color: #ffffff;
+}
