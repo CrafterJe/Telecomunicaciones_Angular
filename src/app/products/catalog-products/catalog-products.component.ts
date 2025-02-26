@@ -117,15 +117,21 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
   }
 
   // Convertir URL segura para el iframe de YouTube
-  getSafeVideoUrl(videoUrl: string): SafeResourceUrl {
+  getSafeVideoUrl(videoUrl: string | undefined): SafeResourceUrl | null {
+    if (!videoUrl) return null;
+
     const videoId = this.extraerVideoIdDeYoutube(videoUrl);
-    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
+    return videoId ? this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`) : null;
   }
 
   extraerVideoIdDeYoutube(url: string): string | null {
-    const regex = /[?&]v=([^&#]*)/;
+    const regex = /(?:youtube\.com\/(?:.*v=|embed\/|v\/)|youtu\.be\/)([^"&?\/\s]+)/;
     const match = url.match(regex);
     return match ? match[1] : null;
+  }
+
+  seleccionarVideo(): void {
+    this.imagenSeleccionada = -1; // Usamos -1 para indicar que el video está seleccionado
   }
 
   abrirModal(producto: any, event?: MouseEvent): void {

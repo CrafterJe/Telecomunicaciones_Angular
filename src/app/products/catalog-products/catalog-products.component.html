@@ -13,10 +13,8 @@
   <!-- 🛒 Products Grid -->
   <div *ngIf="!loading && !error" class="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4">
     <div *ngFor="let producto of productos" class="col">
-      <!-- Aquí solo cambiamos la apariencia de la card -->
       <div class="card h-100 shadow-md rounded-lg overflow-hidden">
         <div class="row g-0 d-flex flex-column flex-lg-row align-items-center">
-
           <!-- 📸 Imagen del producto -->
           <div class="col-12 col-md-4 col-lg-4 d-flex justify-content-center align-items-center position-relative p-3">
             <img
@@ -70,7 +68,6 @@
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -93,16 +90,30 @@
       </div>
 
       <div class="modal-body text-center">
-        <!-- Imagen principal -->
-        <img
-          *ngIf="productoSeleccionado && productoSeleccionado.imagenes?.length"
-          [src]="getImageUrl(productoSeleccionado._id, imagenSeleccionada)"
-          [alt]="'Imagen de ' + productoSeleccionado.nombre"
-          class="modal-image img-fluid rounded"
-        />
+        <!-- Imagen o Video en el modal -->
+        <div class="text-center">
+          <!-- Mostrar imagen -->
+          <img
+            *ngIf="imagenSeleccionada !== -1"
+            [src]="getImageUrl(productoSeleccionado._id, imagenSeleccionada)"
+            [alt]="'Imagen de ' + productoSeleccionado.nombre"
+            class="modal-image img-fluid rounded"
+          />
 
-        <!-- Miniaturas de imágenes -->
+          <!-- Mostrar video cuando se selecciona la miniatura -->
+          <iframe
+            *ngIf="imagenSeleccionada === -1"
+            [src]="getSafeVideoUrl(productoSeleccionado.videoLink)"
+            width="100%"
+            height="400"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <!-- Miniaturas de imágenes y video -->
         <div class="d-flex justify-content-center gap-2 mt-3">
+          <!-- Miniaturas de imágenes -->
           <img
             *ngFor="let imagen of productoSeleccionado.imagenes; let i = index"
             [src]="getImageUrl(productoSeleccionado._id, i)"
@@ -112,20 +123,19 @@
             width="80"
             height="80"
           />
-        </div>
 
-        <!-- Video de YouTube -->
-        <div *ngIf="productoSeleccionado.video" class="mt-4">
-          <iframe
-            [src]="getSafeVideoUrl(productoSeleccionado.video)"
-            width="100%"
-            height="400"
-            frameborder="0"
-            allowfullscreen
-          ></iframe>
+          <!-- Miniatura del video (si existe) -->
+          <img
+            *ngIf="productoSeleccionado.videoLink"
+            [src]="'https://img.youtube.com/vi/' + extraerVideoIdDeYoutube(productoSeleccionado.videoLink) + '/hqdefault.jpg'"
+            class="img-thumbnail cursor-pointer"
+            [ngClass]="{ 'border border-danger': imagenSeleccionada === -1 }"
+            (click)="seleccionarVideo()"
+            width="80"
+            height="80"
+          />
         </div>
       </div>
     </div>
   </div>
 </div>
-
