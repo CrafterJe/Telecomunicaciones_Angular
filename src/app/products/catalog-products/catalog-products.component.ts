@@ -105,6 +105,9 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
 
   // Cambiar imagen en el carrusel
   cambiarImagen(producto: any, cambio: number): void {
+    if (!producto.imagenes || producto.imagenes.length === 0) {
+      return; // Evita errores si no hay imágenes
+    }
     producto.imagenActual = (producto.imagenActual + cambio + producto.imagenes.length) % producto.imagenes.length;
   }
 

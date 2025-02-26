@@ -20,7 +20,7 @@
           <!-- 📸 Imagen del producto -->
           <div class="col-12 col-md-4 col-lg-4 d-flex justify-content-center align-items-center position-relative p-3">
             <img
-              [src]="getImageUrl(producto._id, 0) || 'assets/img/no-image-placeholder.jpg'"
+              [src]="getImageUrl(producto._id, producto.imagenActual) || 'assets/img/no-image-placeholder.jpg'"
               alt="Imagen de {{ producto.nombre }}"
               class="img-fluid rounded"
               style="max-height: 220px; width: 100%; object-fit: contain; cursor: pointer;"
