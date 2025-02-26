@@ -5,6 +5,7 @@ import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import { CapitalizePipe } from '../../capitalize/capitalize.pipe';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 declare const bootstrap: any; // Importación de Bootstrap para modales
 
@@ -25,12 +26,14 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
   error: string | null = null;
   userId: string | null = null;
   productoSeleccionado: any = null;
+  imagenSeleccionada: number = 0;
   modalInstance: any;
 
   constructor(
     private productsService: ProductsService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -56,7 +59,13 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
     this.loading = true;
     this.productsService.getProductos().subscribe({
       next: (data) => {
-        this.productos = data.sort((a: any, b: any) => a.nombre.localeCompare(b.nombre)); // Ordenar alfabéticamente por nombre
+        this.productos = data
+        .map((producto: any) => ({
+          ...producto,
+          imagenActual: 0  // Inicializa la imagen actual en la primera
+        }))
+        .sort((a: any, b: any) => a.nombre.toLowerCase().localeCompare(b.nombre.toLowerCase())); // Ordenar alfabéticamente por nombre
+
         this.loading = false;
       },
       error: (error) => {
@@ -65,7 +74,6 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
       }
     });
   }
-
 
   // Obtener las claves de las especificaciones dinámicamente
   getObjectKeys(obj: any): string[] {
@@ -91,36 +99,96 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
     });
   }
 
-  getImageUrl(productId: string): string {
-    const imageUrl = this.productsService.getProductImage(productId);
-
-    return imageUrl;
+  getImageUrl(productId: string, index: number): string {
+    return this.productsService.getProductImage(productId, index);
   }
 
+  // Cambiar imagen en el carrusel
+  cambiarImagen(producto: any, cambio: number): void {
+    producto.imagenActual = (producto.imagenActual + cambio + producto.imagenes.length) % producto.imagenes.length;
+  }
 
-  abrirModal(producto: any): void {
-    this.productoSeleccionado = producto;
+  // Seleccionar una imagen en el modal
+  seleccionarImagen(index: number): void {
+    this.imagenSeleccionada = index;
+  }
 
-    const modalElement = document.querySelector('.custom-bootstrap-modal');
-    if (modalElement) {
-      this.modalInstance = new bootstrap.Modal(modalElement, {
-        backdrop: 'static', // Evita que se cierre al hacer clic fuera del modal
-        keyboard: true // Permite cerrar con la tecla ESC
-      });
-      this.modalInstance.show();
+  // Convertir URL segura para el iframe de YouTube
+  getSafeVideoUrl(videoUrl: string): SafeResourceUrl {
+    const videoId = this.extraerVideoIdDeYoutube(videoUrl);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
+  }
 
-      // Bootstrap maneja automáticamente el scroll del fondo
+  extraerVideoIdDeYoutube(url: string): string | null {
+    const regex = /[?&]v=([^&#]*)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  }
+
+  abrirModal(producto: any, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
     }
+
+    // Si ya hay una instancia previa del modal, elimínala antes de crear una nueva
+    if (this.modalInstance) {
+      this.modalInstance.dispose();
+      this.modalInstance = null;
+    }
+
+    this.productoSeleccionado = { ...producto };
+    this.imagenSeleccionada = 0;
+
+    setTimeout(() => {
+      const modalElement = document.getElementById('productoModal');
+      if (modalElement) {
+        this.modalInstance = new bootstrap.Modal(modalElement, {
+          backdrop: 'static', // Evita que Bootstrap lo cierre al hacer clic fuera
+          keyboard: true
+        });
+
+        this.modalInstance.show();
+
+        // 🛠️ Elimina backdrop después de que Bootstrap lo haya creado
+        setTimeout(() => {
+          document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            if (document.body.contains(backdrop)) {
+              backdrop.remove();
+            }
+          });
+        }, 500); // Asegura que Bootstrap haya terminado la animación
+      }
+    }, 100);
   }
 
   cerrarModal(): void {
     if (this.modalInstance) {
       this.modalInstance.hide();
-    }
-    this.productoSeleccionado = null;
 
-    // Bootstrap restaura automáticamente el scroll
+      setTimeout(() => {
+        if (this.modalInstance) {
+          this.modalInstance.dispose();
+          this.modalInstance = null;
+        }
+
+        // 🛠️ Asegurar eliminación segura del backdrop
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+          if (document.body.contains(backdrop)) {
+            backdrop.remove();
+          }
+        });
+
+        this.productoSeleccionado = null; // Limpia la selección
+      }, 500); // Espera a que Bootstrap termine de cerrar el modal
+    }
   }
 
+
+  // Asegúrate de limpiar los recursos cuando el componente se destruye
+  ngOnDestroy(): void {
+    if (this.modalInstance) {
+      this.modalInstance.dispose();
+    }
+  }
 
 }

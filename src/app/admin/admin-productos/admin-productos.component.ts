@@ -33,6 +33,12 @@ export class AdminProductosComponent implements OnInit {
   isAddingNewType: boolean = false; // Controla si se usa un dropdown o un input
   isAddingNewTypeEdit: boolean = false;
   selectedTypeEdit: string = '';
+  nuevasImagenes: File[] = [];
+  videoLink: string = '';
+  previewImageUrls: string[] = [];
+  removedImagesIndexes: number[] = []; // Índices de imágenes eliminadas
+  replacedImages: { index: number; file: File }[] = []; // Reemplazos de imagenes
+
 
   constructor(private adminService: AdminService) {}
 
@@ -105,9 +111,12 @@ export class AdminProductosComponent implements OnInit {
       tipo: '',
       precio: 0,
       stock: 0,
-      especificaciones: {}
+      especificaciones: {},
+      imagenes: [], // Arreglo vacío de imágenes
+      video_link: '' // Inicializar el enlace de video vacío
     };
   }
+
 
   openAddProductForm(): void {
     this.isAddingProduct = true;
@@ -121,16 +130,41 @@ export class AdminProductosComponent implements OnInit {
   }
 
   addProduct(): void {
-    if (!this.newProduct.nombre.trim() || !this.newProduct.tipo.trim()) {
-      alert('Por favor ingresa un nombre y tipo para el producto.');
+    if (
+      !this.newProduct.nombre.trim() ||
+      !this.newProduct.tipo.trim() ||
+      isNaN(this.newProduct.precio) || this.newProduct.precio <= 0 ||
+      isNaN(this.newProduct.stock) || this.newProduct.stock < 0
+    ) {
+      alert('❌ El nombre, tipo, precio (mayor a 0) y stock (0 o mayor) son obligatorios.');
       return;
     }
 
-    this.adminService.addProduct(this.newProduct).subscribe(() => {
-      this.loadProducts();
-      this.isAddingProduct = false;
+    const productData = {
+      nombre: this.newProduct.nombre,
+      tipo: this.newProduct.tipo,
+      precio: this.newProduct.precio,  // Número directo
+      stock: this.newProduct.stock,    // Número directo
+      especificaciones: this.newProduct.especificaciones || {},
+      imagenes: this.nuevasImagenes.slice(0, 5), // Enviar imágenes si hay
+      videoLink: this.videoLink || ''
+    };
+
+    // 🚀 Enviar la solicitud como JSON
+    this.adminService.addProduct(productData).subscribe({
+      next: () => {
+        this.loadProducts();
+        this.isAddingProduct = false;
+        this.newProduct = this.createEmptyProduct();
+        alert('✅ Producto agregado correctamente.');
+      },
+      error: (err) => {
+        console.error('❌ Error al agregar producto:', err);
+        alert('Error al agregar el producto.');
+      }
     });
   }
+
 
   toggleSpecMode(): void {
     this.isAddingNewSpec = !this.isAddingNewSpec;
@@ -201,13 +235,76 @@ export class AdminProductosComponent implements OnInit {
   confirmSave(): void {
     if (!this.editingProduct) return;
 
-    this.adminService.updateProduct(this.editingProduct._id, this.editingProduct).subscribe(() => {
-      this.loadProducts();
-      this.editingProduct = null;
-      this.showSaveModal = false;
+    if (!this.editingProduct.nombre.trim() || !this.editingProduct.tipo.trim()) {
+      alert('❌ El nombre y tipo del producto son obligatorios.');
+      return;
+    }
 
+    // ✅ Convertir precio y stock a números y validar
+    let precio, stock;
+
+    try {
+      precio = typeof this.editingProduct.precio === 'number' ?
+        this.editingProduct.precio : parseFloat(String(this.editingProduct.precio).replace(',', '.'));
+
+      stock = typeof this.editingProduct.stock === 'number' ?
+        this.editingProduct.stock : parseInt(String(this.editingProduct.stock), 10);
+
+      if (isNaN(precio) || precio <= 0 || isNaN(stock) || stock < 0) {
+        console.error('❌ Validación fallida. Precio:', this.editingProduct.precio, 'Stock:', this.editingProduct.stock);
+        alert('❌ El precio debe ser un número mayor a 0 y el stock un número entero mayor o igual a 0.');
+        return;
+      }
+    } catch (error) {
+      console.error('❌ Error en la conversión de números:', error);
+      alert('❌ El precio debe ser un número mayor a 0 y el stock un número entero mayor o igual a 0.');
+      return;
+    }
+
+    this.editingProduct.precio = precio;
+    this.editingProduct.stock = stock;
+
+    console.log('Precio antes de enviar:', precio, typeof precio);
+    console.log('Stock antes de enviar:', stock, typeof stock);
+
+    const formData = new FormData();
+
+    formData.append('nombre', this.editingProduct.nombre);
+    formData.append('tipo', this.editingProduct.tipo);
+    formData.append('precio', precio.toString());
+    formData.append('stock', stock.toString());
+
+    if (this.editingProduct.especificaciones) {
+      formData.append('especificaciones', JSON.stringify(this.editingProduct.especificaciones));
+    }
+
+    // ✅ Solo agregar removedImagesIndexes si tiene valores
+    if (this.removedImagesIndexes.length > 0) {
+      formData.append('removedImagesIndexes', JSON.stringify(this.removedImagesIndexes));
+    }
+
+    this.replacedImages.forEach((replacedImg) => {
+      formData.append(`replacedImage_${replacedImg.index}`, replacedImg.file);
+    });
+
+    // 🚀 Enviar la actualización al backend
+    this.adminService.updateProduct(this.editingProduct._id, formData).subscribe({
+      next: () => {
+        this.loadProducts();
+        this.editingProduct = null;
+        this.showSaveModal = false;
+        this.removedImagesIndexes = [];
+        this.replacedImages = [];
+        this.nuevasImagenes = [];
+      },
+      error: (error) => {
+        console.error('❌ Error al actualizar producto:', error);
+        alert('Error al actualizar el producto. Revisa los datos.');
+      }
     });
   }
+
+
 
   cancelSave(): void {
     this.showSaveModal = false;
@@ -226,10 +323,21 @@ export class AdminProductosComponent implements OnInit {
   editProduct(producto: Producto): void {
     this.editingProduct = {
       ...producto,
-      especificaciones: producto.especificaciones || {} // Asegura que nunca sea undefined
+      especificaciones: producto.especificaciones || {}
     };
+
     this.isEditingProduct = true;
     this.isAddingProduct = false;
+
+    // Previsualizar imágenes existentes
+    if (producto.imagenes && producto.imagenes.length > 0) {
+      this.previewImageUrls = producto.imagenes.map((img) => `data:image/jpeg;base64,${img}`);
+    } else {
+      this.previewImageUrls = [];
+    }
+
+    // Enlace de video existente
+    this.videoLink = producto.video_link || '';
   }
 
   cancelEdit(): void {
@@ -246,8 +354,6 @@ export class AdminProductosComponent implements OnInit {
       this.editingProduct = null;
     });
 }
-
-
 
   deleteProduct(id: string): void {
     if (confirm("Estas seguro de eliminar este producto?")) {
@@ -292,6 +398,76 @@ export class AdminProductosComponent implements OnInit {
   removeSpecification(key: string): void {
     if (this.editingProduct?.especificaciones) { // Validación para evitar errores
       delete this.editingProduct.especificaciones[key];
+    }
+  }
+
+  onImagesSelected(event: any): void {
+    const files = event.target.files;
+
+    if (files.length + this.nuevasImagenes.length > 5) {
+      alert('❌ Solo se permiten hasta 5 imágenes en total.');
+      return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+
+      if (fileExtension !== 'jpg' && file.type !== 'image/jpeg') {
+        alert('❌ Solo se permiten imágenes en formato JPG.');
+        return;
+      }
+
+      this.nuevasImagenes.push(file);
+
+      // 🖼️ Generar la previsualización
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewImageUrls.push(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  removeImage(imgUrl: string): void {
+    const index = this.previewImageUrls.indexOf(imgUrl);
+    if (index > -1) {
+      this.previewImageUrls.splice(index, 1);
+      this.nuevasImagenes.splice(index, 1); // Elimina también del arreglo de imágenes
+    }
+  }
+
+  removeExistingImage(index: number): void {
+    if (this.previewImageUrls[index]) {
+      this.removedImagesIndexes.push(index); // 🗑️ Marcar imagen para eliminar
+      this.previewImageUrls.splice(index, 1);
+    }
+  }
+
+  replaceImage(event: any, index: number): void {
+    const file = event.target.files[0];
+    if (file) {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+
+      if (fileExtension !== 'jpg' && file.type !== 'image/jpeg') {
+        alert('❌ Solo se permiten imágenes en formato JPG.');
+        event.target.value = '';
+        return;
+      }
+
+      // 🔄 Reemplazar imagen en la previsualización
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewImageUrls[index] = e.target.result;
+      };
+      reader.readAsDataURL(file);
+
+      // 🔄 Registrar la nueva imagen para enviar al backend
+      const existingReplacement = this.replacedImages.find((img) => img.index === index);
+      if (existingReplacement) {
+        existingReplacement.file = file;
+      } else {
+        this.replacedImages.push({ index, file });
+      }
     }
   }
 }

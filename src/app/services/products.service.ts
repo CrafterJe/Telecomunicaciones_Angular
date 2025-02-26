@@ -16,8 +16,7 @@ export class ProductsService {
     return this.http.get<Producto[]>(`${this.apiUrl}/productos/get_all`);
   }
 
-  getProductImage(productId: string): string {
-    return `${this.apiUrl}/productos/${productId}/imagen`;
+  getProductImage(productId: string, index: number = 0): string {
+    return `${this.apiUrl}/productos/${productId}/imagen/${index}`;
   }
-
 }

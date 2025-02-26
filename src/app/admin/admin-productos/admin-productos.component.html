@@ -59,6 +59,27 @@
     <label>Stock:</label>
     <input type="number" class="form-control mb-2" [(ngModel)]="newProduct.stock">
 
+    <!-- Campo para subir múltiples imágenes -->
+    <label>Imágenes del producto (Máximo 5):</label>
+    <input type="file" accept=".jpg, image/jpeg" (change)="onImagesSelected($event)" multiple />
+
+    <!-- Previsualización de imágenes -->
+    <div *ngIf="previewImageUrls.length > 0" class="image-preview mt-3">
+      <p>Previsualización de las imágenes:</p>
+      <div class="d-flex flex-wrap gap-2">
+        <div *ngFor="let imgUrl of previewImageUrls" class="position-relative">
+          <img [src]="imgUrl" alt="Previsualización de imagen" width="150" height="150" class="rounded border">
+          <button class="btn btn-sm btn-danger position-absolute top-0 end-0" (click)="removeImage(imgUrl)">
+            ❌
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campo para el enlace de video de YouTube -->
+    <label>Enlace de Video (YouTube):</label>
+    <input type="text" class="form-control mb-2" [(ngModel)]="videoLink" placeholder="https://www.youtube.com/watch?v=..." />
+
     <h5>Especificaciones</h5>
     <div>
       <div *ngIf="newProduct.especificaciones">
@@ -115,10 +136,44 @@
 
 
     <label>Precio:</label>
-    <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.precio">
+    <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.precio" min="0" step="0.01" required>
 
     <label>Stock:</label>
-    <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.stock">
+    <input type="number" class="form-control mb-2" [(ngModel)]="editingProduct.stock" min="0" step="1" required>
+
+    <!-- Campo para subir nuevas imágenes -->
+    <label>Imágenes del producto (Máximo 5):</label>
+    <br>
+    <input type="file" accept=".jpg, image/jpeg" (change)="onImagesSelected($event)" multiple />
+
+    <!-- 📸 Imágenes existentes con opciones para eliminar o reemplazar -->
+    <div *ngIf="previewImageUrls.length > 0" class="image-preview mt-3">
+      <p>Imágenes actuales:</p>
+      <div class="d-flex flex-wrap gap-2">
+        <div *ngFor="let imgUrl of previewImageUrls; let i = index" class="position-relative">
+          <img [src]="imgUrl" alt="Imagen actual" width="150" height="150" class="rounded border">
+
+          <!-- ❌ Botón para eliminar imagen -->
+          <button class="btn btn-sm btn-danger position-absolute top-0 end-0" (click)="removeExistingImage(i)">
+            ❌
+          </button>
+
+          <!-- 🔄 Reemplazar imagen -->
+          <input
+            type="file"
+            accept=".jpg, image/jpeg"
+            class="mt-2 form-control"
+            (change)="replaceImage($event, i)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <br>
+    <!-- Campo para agregar el enlace de YouTube -->
+    <label>Enlace de Video (YouTube):</label>
+    <input type="text" class="form-control mb-2" [(ngModel)]="videoLink" placeholder="https://www.youtube.com/watch?v=..." />
 
     <h5>Especificaciones</h5>
     <div *ngIf="editingProduct.especificaciones">
