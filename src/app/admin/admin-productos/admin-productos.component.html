@@ -171,9 +171,9 @@
 
     <br>
     <br>
-    <!-- Campo para agregar el enlace de YouTube -->
+    <!-- Campo para el enlace de video de YouTube en la edición -->
     <label>Enlace de Video (YouTube):</label>
-    <input type="text" class="form-control mb-2" [(ngModel)]="videoLink" placeholder="https://www.youtube.com/watch?v=..." />
+    <input type="text" class="form-control mb-2" [(ngModel)]="editingProduct['videoLink']" placeholder="https://www.youtube.com/watch?v=..." />
 
     <h5>Especificaciones</h5>
     <div *ngIf="editingProduct.especificaciones">

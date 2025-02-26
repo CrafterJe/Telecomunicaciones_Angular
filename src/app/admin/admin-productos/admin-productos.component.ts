@@ -244,14 +244,16 @@ export class AdminProductosComponent implements OnInit {
     let precio, stock;
 
     try {
-      precio = typeof this.editingProduct.precio === 'number' ?
-        this.editingProduct.precio : parseFloat(String(this.editingProduct.precio).replace(',', '.'));
+      precio = typeof this.editingProduct.precio === 'number'
+        ? this.editingProduct.precio
+        : parseFloat(String(this.editingProduct.precio).replace(',', '.'));
 
-      stock = typeof this.editingProduct.stock === 'number' ?
-        this.editingProduct.stock : parseInt(String(this.editingProduct.stock), 10);
+      stock = typeof this.editingProduct.stock === 'number'
+        ? this.editingProduct.stock
+        : parseInt(String(this.editingProduct.stock), 10);
 
       if (isNaN(precio) || precio <= 0 || isNaN(stock) || stock < 0) {
-        console.error('❌ Validación fallida. Precio:', this.editingProduct.precio, 'Stock:', this.editingProduct.stock);
+        console.error('❌ Validación fallida. Precio:', precio, 'Stock:', stock);
         alert('❌ El precio debe ser un número mayor a 0 y el stock un número entero mayor o igual a 0.');
         return;
       }
@@ -264,8 +266,8 @@ export class AdminProductosComponent implements OnInit {
     this.editingProduct.precio = precio;
     this.editingProduct.stock = stock;
 
-    console.log('Precio antes de enviar:', precio, typeof precio);
-    console.log('Stock antes de enviar:', stock, typeof stock);
+    console.log('📌 Precio antes de enviar:', precio, typeof precio);
+    console.log('📌 Stock antes de enviar:', stock, typeof stock);
 
     const formData = new FormData();
 
@@ -274,8 +276,16 @@ export class AdminProductosComponent implements OnInit {
     formData.append('precio', precio.toString());
     formData.append('stock', stock.toString());
 
-    if (this.editingProduct.especificaciones) {
+    // ✅ Asegurar que se envíen especificaciones correctamente
+    if (this.editingProduct.especificaciones && Object.keys(this.editingProduct.especificaciones).length > 0) {
       formData.append('especificaciones', JSON.stringify(this.editingProduct.especificaciones));
+    }
+
+    // ✅ Enviar `videoLink`, si se deja vacío, enviarlo como string vacío para eliminarlo en la BD
+    if (this.editingProduct.videoLink) {
+      formData.append('videoLink', this.editingProduct.videoLink);
+    } else {
+      formData.append('videoLink', ''); // Para eliminar el enlace si el usuario lo borra
     }
 
     // ✅ Solo agregar removedImagesIndexes si tiene valores
@@ -283,6 +293,7 @@ export class AdminProductosComponent implements OnInit {
       formData.append('removedImagesIndexes', JSON.stringify(this.removedImagesIndexes));
     }
 
+    // ✅ Manejar imágenes reemplazadas
     this.replacedImages.forEach((replacedImg) => {
       formData.append(`replacedImage_${replacedImg.index}`, replacedImg.file);
     });
@@ -296,13 +307,14 @@ export class AdminProductosComponent implements OnInit {
         this.removedImagesIndexes = [];
         this.replacedImages = [];
         this.nuevasImagenes = [];
+        alert('✅ Producto actualizado correctamente.');
       },
       error: (error) => {
         console.error('❌ Error al actualizar producto:', error);
         alert('Error al actualizar el producto. Revisa los datos.');
       }
     });
-  }
+}
 
 
 
@@ -336,8 +348,9 @@ export class AdminProductosComponent implements OnInit {
       this.previewImageUrls = [];
     }
 
-    // Enlace de video existente
-    this.videoLink = producto.video_link || '';
+    // Enlace de video existente en la edición
+    this.editingProduct['videoLink'] = producto.videoLink || '';
+
   }
 
   cancelEdit(): void {

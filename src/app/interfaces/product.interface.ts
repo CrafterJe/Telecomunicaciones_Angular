@@ -12,7 +12,7 @@ export interface Producto {
     };
   }[] | string[] | File[]; // Arreglo de imágenes en diferentes formatos
 
-  video_link?: string; // Enlace de video de YouTube
+  videoLink?: string;  // Enlace de video de YouTube
 
   [key: string]: any; // Permitir el acceso dinámico a claves
 }
