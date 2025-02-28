@@ -32,9 +32,21 @@
         </div>
         <div class="product-actions">
           <div class="quantity-control">
-            <button class="quantity-btn bg-red-100 hover:bg-red-200" (click)="actualizarCantidad(producto._id, producto.cantidad - 1)" [disabled]="producto.cantidad <= 1"><i class="fas fa-minus"></i></button>
+
+            <button class="quantity-btn bg-red-100 hover:bg-red-200"
+                    (click)="actualizarCantidad(producto._id, producto.cantidad - 1)"
+                    [disabled]="producto.cantidad <= 1">
+                <i class="fas fa-minus"></i>
+            </button>
+
             <input type="number" class="quantity-input bg-gray-100" [value]="producto.cantidad" readonly/>
-            <button class="quantity-btn bg-green-100 hover:bg-green-200" (click)="actualizarCantidad(producto._id, producto.cantidad + 1)"><i class="fas fa-plus"></i></button>
+
+            <button class="quantity-btn bg-green-100 hover:bg-green-200"
+                    (click)="actualizarCantidad(producto._id, producto.cantidad + 1)"
+                    [disabled]="producto.cantidad >= producto.stock">
+                <i class="fas fa-plus"></i>
+            </button>
+
           </div>
           <button class="delete-btn bg-red-500 text-white rounded hover:bg-red-600" (click)="eliminarProducto(producto._id)">
             <i class="fas fa-trash"></i>

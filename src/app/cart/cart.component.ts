@@ -47,34 +47,34 @@ export class CartComponent implements OnInit {
 }
 
 
-  actualizarCantidad(productoId: string, nuevaCantidad: number): void {
-    if (nuevaCantidad <= 0) {
-      alert('Cantidad inválida.');
+actualizarCantidad(productoId: string, nuevaCantidad: number): void {
+  if (nuevaCantidad <= 0) {
+      alert('❌ Cantidad inválida.');
       return;
-    }
-
-    const userId = localStorage.getItem('userId');
-    if (!userId) return;
-
-    this.cartService.actualizarCantidadProducto(userId, productoId, nuevaCantidad).subscribe({
-      next: () => {
-        this.cartService.getCartItems(userId).subscribe({
-          next: (carritoActualizado) => {
-            this.carrito = carritoActualizado;
-            this.cdr.markForCheck();
-          },
-          error: (error) => {
-            console.error('Error al recargar el carrito:', error);
-            this.error = 'No se pudo recargar el carrito.';
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Error al actualizar la cantidad:', error);
-        this.error = 'No se pudo actualizar la cantidad.';
-      }
-    });
   }
+
+  const producto = this.carrito.productos.find((p: any) => p._id === productoId);
+  if (!producto) return;
+
+  if (nuevaCantidad > producto.stock) {
+      alert(`⚠️ No puedes agregar más de ${producto.stock} unidades.`);
+      return;
+  }
+
+  const userId = localStorage.getItem('userId');
+  if (!userId) return;
+
+  this.cartService.actualizarCantidadProducto(userId, productoId, nuevaCantidad).subscribe({
+      next: (response: any) => {
+          if (response && response.message === "error_controlado") {
+              console.log(response.error);
+          } else {
+              this.carrito = response.carrito;
+              this.cdr.detectChanges(); // ✅ Forzar actualización de la vista
+          }
+      }
+  });
+}
 
   eliminarProducto(productoId: string): void {
     const userId = localStorage.getItem('userId');

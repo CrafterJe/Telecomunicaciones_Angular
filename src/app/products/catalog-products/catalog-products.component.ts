@@ -83,21 +83,37 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
   // Agregar producto al carrito
   agregarAlCarrito(productoId: string, cantidad: number): void {
     if (!this.userId) {
-      alert('Inicia sesión para agregar productos al carrito');
-      return;
+        alert('🚨 Inicia sesión para agregar productos al carrito');
+        return;
     }
 
-    this.cartService.agregarAlCarrito(this.userId, productoId, cantidad).subscribe({
-      next: (response: any) => {
-        console.log('Producto agregado al carrito:', response);
-        alert('Producto agregado exitosamente.');
-      },
-      error: (error: any) => {
-        console.error('Error al agregar producto al carrito:', error);
-        alert('No se pudo agregar el producto al carrito.');
-      },
+    const userId = this.userId!;
+
+    // Buscar el producto en la lista de productos cargados
+    const producto = this.productos.find(p => p._id === productoId);
+    if (!producto) return;
+
+    // ❌ Evitar solicitud al backend si el stock es insuficiente
+    if (cantidad > producto.stock) {
+      alert(`⚠️ Stock insuficiente. Solo quedan ${producto.stock} unidades disponibles.`);
+        return;
+    }
+
+    // ✅ Solo si el stock es suficiente, hacer la petición al backend
+    this.cartService.agregarAlCarrito(userId, productoId, cantidad).subscribe({
+        next: (response: any) => {
+            if (response && response.message === "error_controlado") {
+                console.log(`⚠️ ${response.error}`); // Mostrar mensaje del backend sin errores en consola
+            } else {
+                alert('✅ Producto agregado exitosamente.');
+            }
+        },
+        error: () => {
+            // 🔹 No mostrar error en consola, ya que está controlado en `cart.service.ts`
+        },
     });
-  }
+}
+
 
   getImageUrl(productId: string, index: number): string {
     return this.productsService.getProductImage(productId, index);

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable,throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -49,9 +49,15 @@ export class CartService {
     const body = { userId, productoId, cantidad };
 
     return this.http.post<any>(url, body).pipe(
-      tap(() => {
-        // Actualiza el carrito después de agregar un producto
-        this.getCartItems(userId).subscribe();
+      tap((response) => {
+        if (response && response.message === "error_controlado") {
+          alert(`⚠️ ${response.error}`);// ✅ Muestra el mensaje sin imprimir en consola
+        } else {
+          this.getCartItems(userId).subscribe();
+        }
+      }),
+      catchError(() => {
+        return of(null); // ✅ Evita que se registre el error en la consola
       })
     );
   }
@@ -77,11 +83,15 @@ export class CartService {
     const body = { usuario_id: userId, producto_id: productoId, cantidad };
 
     return this.http.post<any>(url, body).pipe(
-      tap((carritoActualizado) => {
-        if (carritoActualizado && carritoActualizado.carrito) {
-          this.carritoSubject.next(carritoActualizado.carrito);
-          console.log("✅ Producto actualizado del carrito en el backend");
+      tap((response) => {
+        if (response && response.message === "error_controlado") {
+          alert(`⚠️ ${response.error}`); // ✅ Muestra mensaje sin imprimir en consola
+        } else if (response && response.carrito) {
+          this.carritoSubject.next(response.carrito);
         }
+      }),
+      catchError(() => {
+        return of(null); // ✅ Evita que el error aparezca en la consola
       })
     );
   }
