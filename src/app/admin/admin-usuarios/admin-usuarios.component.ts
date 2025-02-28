@@ -14,6 +14,8 @@ import { FormsModule } from '@angular/forms';
 export class AdminUsuariosComponent implements OnInit {
   usuarios: any[] = [];
   usuarioActual: string = '';
+  loading: boolean = true;
+
 
   constructor(private adminService: AdminService, private authService: AuthService) {}
 
@@ -25,6 +27,7 @@ export class AdminUsuariosComponent implements OnInit {
   cargarUsuarios(): void {
     this.adminService.getUsuarios().subscribe(data => {
       this.usuarios = data;
+      this.loading = false;
     });
   }
 

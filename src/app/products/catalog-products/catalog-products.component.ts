@@ -80,7 +80,7 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
     return obj ? Object.keys(obj) : [];
   }
 
-  // 📦 Agregar producto al carrito
+  // Agregar producto al carrito
   agregarAlCarrito(productoId: string, cantidad: number): void {
     if (!this.userId) {
       alert('Inicia sesión para agregar productos al carrito');

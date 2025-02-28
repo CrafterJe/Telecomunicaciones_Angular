@@ -13,6 +13,7 @@ import { Producto } from '../../interfaces/product.interface';
   styleUrls: ['./admin-productos.component.css']
 })
 export class AdminProductosComponent implements OnInit {
+  loading: boolean = true;
   products: Producto[] = [];
   filteredProducts: Producto[] = [];
   searchQuery: string = '';
@@ -47,6 +48,7 @@ export class AdminProductosComponent implements OnInit {
   }
 
   loadProducts(): void {
+    this.loading = true;
     this.adminService.getProducts().subscribe({
       next: (data) => {
         console.log("📦 Productos recibidos desde el backend:", data);
@@ -54,11 +56,13 @@ export class AdminProductosComponent implements OnInit {
         this.filteredProducts = [...this.products];
         this.extractAvailableTypes();
         this.extractAvailableSpecifications();
+        this.loading = false;
       },
       error: (err) => {
         console.error("❌ Error al obtener productos:", err);
         this.products = [];
         this.filteredProducts = [];
+        this.loading = false;
       }
     });
   }

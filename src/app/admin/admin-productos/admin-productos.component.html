@@ -6,18 +6,28 @@
   <!-- 🔍 Search Bar -->
   <input type="text" class="form-control mb-3" placeholder="Buscar producto..." [(ngModel)]="searchQuery" (input)="filterProducts()">
 
-  <!-- 📋 Products Table -->
-  <table class="table table-bordered mt-3">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Tipo</th>
-        <th>Precio</th>
-        <th>Stock</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
+<!-- 📋 Products Table (siempre visible) -->
+<table class="table table-bordered mt-3">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Tipo</th>
+      <th>Precio</th>
+      <th>Stock</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Mostrar fila de carga mientras se obtienen los datos -->
+    <tr *ngIf="loading">
+      <td colspan="5" class="text-center">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2">Cargando productos...</p>
+      </td>
+    </tr>
+
+    <!-- Usar ng-container para evitar el error -->
+    <ng-container *ngIf="!loading">
       <tr *ngFor="let producto of filteredProducts">
         <td>{{ producto.nombre }}</td>
         <td>{{ producto.tipo }}</td>
@@ -28,8 +38,11 @@
           <button (click)="openDeleteModal(producto._id)" class="btn btn-danger">Eliminar</button>
         </td>
       </tr>
-    </tbody>
-  </table>
+    </ng-container>
+  </tbody>
+
+</table>
+
 
   <!-- Formulario para agregar un nuevo producto -->
   <div *ngIf="isAddingProduct && !isEditingProduct" class="mt-4 p-3 border rounded">

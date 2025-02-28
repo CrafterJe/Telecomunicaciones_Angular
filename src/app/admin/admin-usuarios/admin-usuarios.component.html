@@ -12,26 +12,37 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let usuario of usuarios">
-        <td>{{ usuario._id }}</td>
-        <td>{{ usuario.nombre }}</td>
-        <td>{{ usuario.email }}</td>
-        <td>
-          <!-- 🔥 Dropdown para cambiar el rol (deshabilitado si es el usuario actual) -->
-          <select class="form-select" [(ngModel)]="usuario.rol"
-                  (change)="cambiarRol(usuario)"
-                  [disabled]="usuarioActual === usuario._id">
-            <option value="usuario">Usuario</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </td>
-        <td>
-          <button class="btn btn-danger btn-sm" (click)="eliminarUsuario(usuario._id)"
-            [disabled]="usuarioActual === usuario._id">
-            Eliminar
-          </button>
+      <!-- Mostrar la fila de carga mientras se obtienen los datos -->
+      <tr *ngIf="loading">
+        <td colspan="5" class="text-center">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2">Cargando usuarios...</p>
         </td>
       </tr>
+
+      <!-- Usar ng-container para evitar errores de directivas -->
+      <ng-container *ngIf="!loading">
+        <tr *ngFor="let usuario of usuarios">
+          <td>{{ usuario._id }}</td>
+          <td>{{ usuario.nombre }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <!-- 🔥 Dropdown para cambiar el rol (deshabilitado si es el usuario actual) -->
+            <select class="form-select" [(ngModel)]="usuario.rol"
+                    (change)="cambiarRol(usuario)"
+                    [disabled]="usuarioActual === usuario._id">
+              <option value="usuario">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-danger btn-sm" (click)="eliminarUsuario(usuario._id)"
+              [disabled]="usuarioActual === usuario._id">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 </div>
