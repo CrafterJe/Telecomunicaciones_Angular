@@ -23,10 +23,14 @@ export class CartService {
   getCartItems(userId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/carrito/${userId}`).pipe(
       tap((carrito) => {
-        this.carritoSubject.next(carrito); // Actualiza el BehaviorSubject
+        // Asegurar que subtotal y total siempre tengan dos decimales
+        carrito.subtotal = parseFloat(carrito.subtotal.toFixed(2));
+        carrito.total = parseFloat(carrito.total.toFixed(2));
+        this.carritoSubject.next(carrito);
       })
     );
   }
+
 
   // Método para inicializar el carrito desde el inicio
   initializeCart(userId: string): void {
@@ -57,8 +61,12 @@ export class CartService {
     const url = `${this.apiUrl}/carrito/${userId}/producto/${productoId}`;
     return this.http.delete<any>(url).pipe(
       tap(() => {
-        // Actualiza el carrito después de eliminar un producto
-        this.getCartItems(userId).subscribe();
+        console.log("✅ Producto eliminado del carrito en el backend");
+        this.getCartItems(userId).subscribe(); // Actualiza el carrito después de eliminar
+      }),
+      catchError((error) => {
+        console.error("❌ Error en la solicitud DELETE:", error);
+        return of(null);
       })
     );
   }
@@ -70,19 +78,13 @@ export class CartService {
 
     return this.http.post<any>(url, body).pipe(
       tap((carritoActualizado) => {
-        if (carritoActualizado && carritoActualizado.productos) {
-          this.carritoSubject.next(carritoActualizado); // Emite el carrito actualizado
-        } else {
-          console.error('Respuesta no válida del backend:', carritoActualizado);
+        if (carritoActualizado && carritoActualizado.carrito) {
+          this.carritoSubject.next(carritoActualizado.carrito);
+          console.log("✅ Producto actualizado del carrito en el backend");
         }
-      }),
-      catchError((error) => {
-        console.error('Error al actualizar la cantidad:', error);
-        return of(this.carritoSubject.getValue()); // Devuelve el último valor conocido
       })
     );
   }
-
 
   // Método para recalcular el total del carrito
   recalcularTotal() {

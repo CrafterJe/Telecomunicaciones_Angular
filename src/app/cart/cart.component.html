@@ -45,11 +45,15 @@
     <div class="cart-footer">
       <div class="subtotal">
         <span><i class="fas fa-receipt"></i> Subtotal:</span>
-        <span class="text-blue-600 font-semibold">${{ carrito.total }}</span>
+        <span class="text-blue-600 font-semibold">
+          {{ carrito?.subtotal ? carrito.subtotal.toFixed(2) : '0.00' }}
+        </span>
       </div>
       <div class="total">
         <span><i class="fas fa-money-bill-wave"></i> Total:</span>
-        <span class="text-green-600 font-bold">${{ (carrito.total * 1.161).toFixed(2) + " + 16% IVA"}}</span>
+        <span class="text-green-600 font-bold">
+          {{ carrito?.total ? carrito.total.toFixed(2) + " IVA Incluido" : '0.00 IVA Incluido' }}
+        </span>
       </div>
       <button class="checkout-btn shadow-lg" routerLink="/payment">
         <i class="fas fa-credit-card"></i> Proceder al pago

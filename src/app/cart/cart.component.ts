@@ -27,12 +27,16 @@ export class CartComponent implements OnInit {
     if (userId) {
       this.cartService.getCartItems(userId).subscribe({
         next: (carrito) => {
-          this.carrito = carrito;
+          this.carrito = {
+            ...carrito,
+            subtotal: carrito.subtotal ?? 0.00,
+            total: carrito.total ?? 0.00
+          };
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error al obtener el carrito:', error);
-          this.error = 'No se pudo cargar el carrito.';
+          console.error('❌ Error al obtener el carrito:', error);
+          this.error = '❌ No se pudo cargar el carrito. Intenta nuevamente.';
           this.loading = false;
         }
       });
@@ -40,7 +44,8 @@ export class CartComponent implements OnInit {
       this.loading = false;
       this.error = '🚨 ¡Ups! Parece que no has iniciado sesión. 🛒<br>✨ Para agregar productos a tu carrito, inicia sesión ahora y disfruta de una mejor experiencia!✨';
     }
-  }
+}
+
 
   actualizarCantidad(productoId: string, nuevaCantidad: number): void {
     if (nuevaCantidad <= 0) {
@@ -77,15 +82,24 @@ export class CartComponent implements OnInit {
 
     this.cartService.eliminarProducto(userId, productoId).subscribe({
       next: () => {
+        // Filtrar el producto eliminado
         this.carrito.productos = this.carrito.productos.filter(
           (producto: any) => producto._id !== productoId
         );
-        this.cdr.markForCheck();
+
+        // Recalcular subtotal y total después de eliminar
+        this.carrito.subtotal = this.carrito.productos.reduce(
+          (acc: number, producto: any) => acc + producto.precio * producto.cantidad, 0
+        );
+        this.carrito.total = parseFloat((this.carrito.subtotal * 1.16).toFixed(2));
+
+        // Forzar actualización de la vista
+        this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('Error al eliminar el producto:', error);
-        this.error = 'No se pudo eliminar el producto.';
+        console.error('❌ Error al eliminar el producto:', error);
+        this.error = '❌ No se pudo eliminar el producto.';
       }
     });
-  }
+}
 }
