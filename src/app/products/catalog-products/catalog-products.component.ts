@@ -47,7 +47,7 @@ export class CatalogProductsComponent implements OnInit, OnChanges {
     }
   }
 
-  // 🔄 Detectar cambios en la lista de productos (por si se editan en admin-productos)
+  // Detectar cambios en la lista de productos (por si se editan en admin-productos)
   ngOnChanges(changes: SimpleChanges): void {
     if (changes) {
       this.cargarProductos(); // 🔄 Recarga los productos si hay cambios

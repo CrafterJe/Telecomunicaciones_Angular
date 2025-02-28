@@ -127,6 +127,10 @@ export class AdminProductosComponent implements OnInit {
     this.isEditingProduct = false;  // Asegurar que si se abre este, el otro se cierre
     this.editingProduct = null;  // Limpiar cualquier edición en curso
     this.newProduct = this.createEmptyProduct();
+
+    this.nuevasImagenes = [];
+    this.previewImageUrls = [];
+    this.videoLink = '';
   }
 
   cancelAddProduct(): void {
