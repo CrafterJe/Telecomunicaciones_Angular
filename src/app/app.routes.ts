@@ -11,7 +11,7 @@ import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard
 import { AdminUsuariosComponent } from './admin/admin-usuarios/admin-usuarios.component';
 import { AdminReportesComponent } from './admin/admin-reportes/admin-reportes.component';
 import { AdminProductosComponent } from './admin/admin-productos/admin-productos.component';
-import { PaymentComponent } from './payment/payment.component';
+import { CheckoutComponent } from './payment/checkout/checkout.component';
 import { AccountLayoutComponent } from './layouts/account-layout/account-layout.component';
 import { AccountComponent } from './account/account/account.component';
 import { ConfigComponent } from './account/config/config.component';
@@ -25,7 +25,7 @@ export const routes: Routes = [
   { path: 'cart', component: CartComponent },
   { path: 'login', component: LoginComponent},
   { path: 'register', component: RegisterComponent},
-  { path: 'payment', component: PaymentComponent},
+  { path: 'checkout', component: CheckoutComponent},
 
 
   {

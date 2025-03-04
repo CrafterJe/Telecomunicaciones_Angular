@@ -8,6 +8,7 @@ import { switchMap } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { CartService } from './cart.service';
+import { User } from '../interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -129,11 +130,12 @@ export class AuthService {
   /**
    * Método para iniciar sesión
    */
-  login(credentials: { usuario: string, password: string }): Observable<any> {
+  login(credentials: { usuario: string; password: string; captcha: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       catchError((error) => {
         console.error('Error en el login:', error);
-        return throwError(() => new Error('Credenciales inválidas. Intenta nuevamente.'));
+        alert('Error al iniciar sesión: ' + (error.error?.message || 'Intenta nuevamente.'));
+        return throwError(() => new Error('Error en el login.'));
       })
     );
   }
@@ -141,7 +143,7 @@ export class AuthService {
   /**
    * Método para registrar un nuevo usuario
    */
-  register(user: any): Observable<any> {
+  register(user: User): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, user).pipe(
       catchError((error) => {
         console.error('Error en el registro:', error);

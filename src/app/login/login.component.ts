@@ -5,6 +5,8 @@ import { CartService } from '../services/cart.service';
 import { Router } from '@angular/router';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
+declare var grecaptcha: any;
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -29,33 +31,33 @@ export class LoginComponent {
       return;
     }
 
+    // Obtener el token de reCAPTCHA
+    const captchaResponse = grecaptcha.getResponse();
+    if (!captchaResponse) {
+      alert('Por favor, completa el reCAPTCHA.');
+      return;
+    }
+
     const credentials = {
       usuario: this.username,
-      password: this.password
+      password: this.password,
+      captcha: captchaResponse  // Enviar el token de reCAPTCHA al backend
     };
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        //console.log('Login exitoso:', response);
+        this.authService.handleLogin(response.token);
 
-        // Manejar el token y extraer datos del usuario
-        const token = response.token;
-        this.authService.handleLogin(token);
-
-        // Inicializar el carrito tras el login
         const userId = localStorage.getItem('userId');
         if (userId) {
           this.cartService.initializeCart(userId);
         }
 
-        // Redirigir a la página de inicio
         alert('Inicio de sesión exitoso');
         this.router.navigate(['/Home']);
       },
-      error: (error) => {
-        console.error('Error al iniciar sesión:', error);
-        this.error = 'Credenciales inválidas. Intenta nuevamente.';
-        alert(this.error); // Mostrar el error al usuario
+      error: () => {
+        alert('Credenciales inválidas.');
       }
     });
   }
