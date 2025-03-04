@@ -1,6 +1,6 @@
-import { Component, OnInit, NgZone, AfterViewInit } from '@angular/core';
+import { Component, OnInit, NgZone, AfterViewInit, Inject, PLATFORM_ID, ChangeDetectorRef  } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
 import { Router } from '@angular/router';
@@ -26,150 +26,142 @@ export class LoginComponent implements OnInit, AfterViewInit {
   error: string | null = null;
   recaptchaLoaded: boolean = false;
   recaptchaWidgetId: any = null;
-  alreadyRendered: boolean = false; // Evitar múltiples renderizaciones
+  siteKey: string = '6LcU3egqAAAAABFTdP3e4lFGmr_NpyhXhgSjvEDy';
+  alreadyRendered: boolean = false; // Añadido de vuelta
+  private scriptLoaded: boolean = false; // Nueva bandera para controlar carga de script
 
   constructor(
     private authService: AuthService,
     private cartService: CartService,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cdRef: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
   ngOnInit(): void {
-    this.loadRecaptchaScript();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadRecaptchaScript();
+    }
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      if (!this.alreadyRendered && typeof grecaptcha !== 'undefined' && grecaptcha.render) {
-        this.renderReCaptcha();
-      }
-      this.ngZone.run(() => {
-        console.log('Marking application as stable');
-      });
-    }, 1000);
+    if (isPlatformBrowser(this.platformId)) {
+      this.waitForRecaptcha();
+    }
   }
 
-
+  /**
+   * Cargar el script de reCAPTCHA solo si no está en la página
+   */
   loadRecaptchaScript(): void {
-    if (typeof document === 'undefined') {
-      console.warn('`document` is not available, skipping reCAPTCHA script loading');
-      return;
-    }
+    if (!isPlatformBrowser(this.platformId) || this.scriptLoaded) return;
 
     if (document.querySelector('script[src*="recaptcha/api.js"]')) {
-      console.log('reCAPTCHA script already loaded');
-      this.waitForRecaptcha();
+      console.log('✅ El script de reCAPTCHA ya está cargado.');
+      this.scriptLoaded = true;
       return;
     }
 
-    console.log('Loading reCAPTCHA script');
+    console.log('⏳ Cargando script de reCAPTCHA...');
     const script = document.createElement('script');
     script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoaded&render=explicit';
     script.async = true;
     script.defer = true;
 
-    window.onRecaptchaLoaded = () => {
-      this.ngZone.run(() => {
-        console.log('reCAPTCHA loaded via callback');
-        this.recaptchaLoaded = true;
-        this.renderReCaptcha();
-      });
-    };
-
     script.onload = () => {
-      console.log('reCAPTCHA script loaded');
+      console.log('✅ Script de reCAPTCHA cargado.');
+      this.scriptLoaded = true;
       this.waitForRecaptcha();
     };
 
     document.head.appendChild(script);
   }
 
-
+  /**
+   * Esperar a que `grecaptcha` esté disponible y luego renderizar
+   */
   waitForRecaptcha(): void {
-    const checkRecaptcha = () => {
-      if (!this.alreadyRendered && typeof grecaptcha !== 'undefined' && grecaptcha.render) {
-        this.ngZone.run(() => {
-          console.log('reCAPTCHA is now available');
-          this.recaptchaLoaded = true;
-          this.renderReCaptcha();
-        });
-      } else {
-        console.log('Waiting for reCAPTCHA...');
-        setTimeout(checkRecaptcha, 100);
-      }
-    };
+    if (!isPlatformBrowser(this.platformId) || this.alreadyRendered) return;
 
-    checkRecaptcha();
+    if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
+      console.log('✅ reCAPTCHA está listo para renderizar.');
+      this.renderReCaptcha();
+    } else {
+      console.log('🔄 Esperando que grecaptcha esté disponible...');
+      setTimeout(() => this.waitForRecaptcha(), 500);
+    }
   }
 
+  /**
+   * Renderiza el reCAPTCHA en el contenedor y marca que está listo
+   */
   renderReCaptcha(): void {
-    if (this.alreadyRendered) {
-      console.log('reCAPTCHA already rendered, skipping...');
-      return;
-    }
+    if (!isPlatformBrowser(this.platformId) || this.alreadyRendered) return;
 
-    console.log('Attempting to render reCAPTCHA');
+    console.log('🔄 Intentando renderizar reCAPTCHA...');
     const container = document.getElementById('recaptcha-container');
     if (!container) {
-      console.error('reCAPTCHA container not found');
+      console.error('❌ No se encontró el contenedor de reCAPTCHA.');
       return;
     }
 
     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
       try {
-        console.log('Rendering reCAPTCHA...');
-        container.innerHTML = '';
+        container.innerHTML = ''; // Limpiar antes de renderizar
+        this.recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
+          sitekey: this.siteKey,
+          callback: (response: any) => {
+            this.ngZone.run(() => {
+              console.log('✅ reCAPTCHA validado.');
+              this.recaptchaLoaded = true;
+              this.cdRef.detectChanges();
+            });
+          },
+          'expired-callback': () => {
+            this.ngZone.run(() => {
+              console.log('⚠️ reCAPTCHA expirado.');
+              this.recaptchaLoaded = false;
+              this.cdRef.detectChanges();
+            });
+          },
+          'error-callback': () => {
+            this.ngZone.run(() => {
+              console.error('❌ Error en reCAPTCHA.');
+              this.recaptchaLoaded = false;
+              this.cdRef.detectChanges();
+            });
+          }
+        });
 
-        if (this.recaptchaWidgetId !== null) {
-          grecaptcha.reset(this.recaptchaWidgetId);
-          console.log('reCAPTCHA widget reset');
-        } else {
-          this.recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
-            'sitekey': '6LcU3egqAAAAABFTdP3e4lFGmr_NpyhXhgSjvEDy',
-            'callback': (response: any) => {
-              this.ngZone.run(() => {
-                console.log('reCAPTCHA response received');
-              });
-            },
-            'expired-callback': () => {
-              this.ngZone.run(() => {
-                console.log('reCAPTCHA expired');
-              });
-            },
-            'error-callback': () => {
-              this.ngZone.run(() => {
-                console.error('reCAPTCHA error');
-              });
-            }
-          });
-          console.log('reCAPTCHA widget rendered with ID:', this.recaptchaWidgetId);
-        }
-
-        this.alreadyRendered = true; // Marcar que ya se renderizó
+        console.log('✅ reCAPTCHA renderizado correctamente.');
+        this.recaptchaLoaded = true;
+        this.alreadyRendered = true; // Evitar futuras renderizaciones
+        this.cdRef.detectChanges();
       } catch (e) {
-        console.error('Error rendering reCAPTCHA:', e);
+        console.error('❌ Error al renderizar reCAPTCHA:', e);
       }
     } else {
-      console.error('grecaptcha is not available yet');
+      console.error('⚠️ grecaptcha aún no está disponible.');
+      setTimeout(() => this.renderReCaptcha(), 500);
     }
   }
 
   login(): void {
     if (!this.username || !this.password) {
-      alert('Por favor, complete ambos campos.');
+      alert('❌ Por favor, complete ambos campos.');
       return;
     }
 
     if (!this.recaptchaLoaded) {
-      alert('El reCAPTCHA aún no se ha cargado. Por favor espere un momento.');
+      alert('⚠️ El reCAPTCHA aún no se ha cargado. Por favor espere un momento.');
       return;
     }
 
     try {
       const captchaResponse = grecaptcha.getResponse(this.recaptchaWidgetId);
       if (!captchaResponse) {
-        alert('Por favor, completa el reCAPTCHA.');
+        alert('⚠️ Por favor, completa el reCAPTCHA.');
         return;
       }
 
@@ -188,19 +180,19 @@ export class LoginComponent implements OnInit, AfterViewInit {
             this.cartService.initializeCart(userId);
           }
 
-          alert('Inicio de sesión exitoso');
+          alert('✅ Inicio de sesión exitoso');
           this.router.navigate(['/Home']);
         },
         error: () => {
-          console.log('Credenciales inválidas.');
+          console.log('❌ Credenciales inválidas.');
           if (this.recaptchaWidgetId !== null) {
             grecaptcha.reset(this.recaptchaWidgetId);
           }
         }
       });
     } catch (error) {
-      console.error('Error with reCAPTCHA:', error);
-      alert('Hubo un problema con el reCAPTCHA. Por favor recargue la página.');
+      console.error('❌ Error con reCAPTCHA:', error);
+      alert('⚠️ Hubo un problema con el reCAPTCHA. Por favor recargue la página.');
     }
   }
 }

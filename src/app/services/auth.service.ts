@@ -27,10 +27,10 @@ export class AuthService {
     this.initializeRole(); // Inicializa el estado al cargar el servicio
 
     if (isPlatformBrowser(this.platformId)) {
-      // 🔥 Guardamos una marca en sessionStorage cuando Angular se inicia
+      // 🔥 Guardamos una marca de que Angular está activo
       sessionStorage.setItem('angular_active', 'true');
 
-      // ⛔ Evento que detecta cierre inesperado de Angular (Ctrl + C)
+      // ⛔ Detectar si Angular realmente se cerró o solo se recargó
       window.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
           sessionStorage.setItem('angular_closed_properly', 'false'); // Indica que Angular se cerró inesperadamente
@@ -38,10 +38,17 @@ export class AuthService {
       });
 
       window.addEventListener('beforeunload', () => {
-        if (sessionStorage.getItem('angular_closed_properly') === 'false') {
+        // 🚀 Solo cerrar sesión si Angular realmente se cerró (Ctrl + C), no si se recargó
+        if (sessionStorage.getItem('angular_closed_properly') === 'false' && performance.navigation.type !== 1)
+          {
           console.warn("🛑 Angular se cerró inesperadamente. Eliminando sesión...");
-          this.clearSession(); // ❌ Elimina el token solo si Angular se cerró con Ctrl + C
+          this.clearSession(); // ❌ Eliminar sesión solo si Angular se cerró
         }
+      });
+
+      // 🛠️ Al recargar, marcamos que Angular sigue abierto correctamente
+      window.addEventListener('load', () => {
+        sessionStorage.setItem('angular_closed_properly', 'true');
       });
     }
   }
