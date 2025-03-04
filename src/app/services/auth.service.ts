@@ -25,11 +25,30 @@ export class AuthService {
   ) {
     this.initializeUserState();
     this.initializeRole(); // Inicializa el estado al cargar el servicio
+
+    if (isPlatformBrowser(this.platformId)) {
+      // 🔥 Guardamos una marca en sessionStorage cuando Angular se inicia
+      sessionStorage.setItem('angular_active', 'true');
+
+      // ⛔ Evento que detecta cierre inesperado de Angular (Ctrl + C)
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          sessionStorage.setItem('angular_closed_properly', 'false'); // Indica que Angular se cerró inesperadamente
+        }
+      });
+
+      window.addEventListener('beforeunload', () => {
+        if (sessionStorage.getItem('angular_closed_properly') === 'false') {
+          console.warn("🛑 Angular se cerró inesperadamente. Eliminando sesión...");
+          this.clearSession(); // ❌ Elimina el token solo si Angular se cerró con Ctrl + C
+        }
+      });
+    }
   }
 
   isTokenExpired(): boolean {
     if (typeof localStorage === 'undefined') {
-      return true; // Si localStorage no está disponible, asumir que el token ha expirado
+      return true; // Si `localStorage` no está disponible, asumir que el token ha expirado
     }
 
     const token = this.getToken();
@@ -42,15 +61,13 @@ export class AuthService {
       const currentTime = Math.floor(Date.now() / 1000);
 
       if (decodedToken.exp < currentTime) {
-        console.warn("⚠️ Token expirado, eliminando...");
-        this.logout();  // Eliminar el token al instante
-        return true;
+        console.warn("⚠️ Token expirado.");
+        return true; // Solo devolver `true`, sin cerrar sesión automáticamente
       }
       return false;
     } catch (error) {
       console.error("❌ Error al decodificar el token:", error);
-      this.logout();  // Si hay error en el token, también eliminarlo
-      return true;
+      return true; // Considerar token inválido si hay error
     }
   }
 

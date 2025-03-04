@@ -3,7 +3,7 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { User } from '../interfaces/user.interface'; 
+import { User } from '../interfaces/user.interface';
 
 @Component({
   selector: 'app-register',
@@ -26,11 +26,12 @@ export class RegisterComponent {
     const user: User = {
       nombre: this.nombre,
       apellidoP: this.apellidoP,
-      apellidoM: this.apellidoM?.trim() || '',  // Si está vacío, se asigna una cadena vacía
+      apellidoM: this.apellidoM?.trim() || '',
       usuario: this.usuario,
       email: this.email,
       password: this.password,
-      fecha_registro: new Date().toISOString()
+      fecha_registro: new Date().toISOString(),
+      direcciones: []  // Se envía como array vacío si no hay direcciones
     };
 
     this.authService.register(user).subscribe({
@@ -44,5 +45,4 @@ export class RegisterComponent {
       }
     });
   }
-
 }

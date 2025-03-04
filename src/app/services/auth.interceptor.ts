@@ -6,7 +6,7 @@ import { HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-let sessionExpiredHandled = false; // Variable global para evitar múltiples alertas
+let sessionExpiredHandled = false; // Evitar múltiples alertas
 
 export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
   if (typeof localStorage === 'undefined') {
@@ -32,18 +32,20 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
       error: (err) => {
         const isLoginRequest = req.url.includes('/login'); // Detectar si es la petición de login
 
-        if (!isLoginRequest && (err.status === 403 || err.status === 401) && !sessionExpiredHandled) {
-          sessionExpiredHandled = true; // Evitar que se ejecute más de una vez
+        if (!isLoginRequest && (err.status === 403 || err.status === 401)) {
+          if (!sessionExpiredHandled) {
+            sessionExpiredHandled = true; // Evitar múltiples ejecuciones
 
-          alert('⚠️ Tu sesión ha expirado. Inicia sesión nuevamente.');
+            console.warn("⚠️ Token expirado. Cerrando sesión...");
 
-          authService.logoutExpiredSession();  // Llamar logout específico para token expirado
+            authService.logoutExpiredSession(); // Cerrar sesión solo si se intenta hacer una petición
 
-          router.navigate(['/login']).then(() => {
-            setTimeout(() => {
-              sessionExpiredHandled = false; // Resetear después de que el usuario vuelva a login
-            }, 500);
-          });
+            router.navigate(['/login']).then(() => {
+              setTimeout(() => {
+                sessionExpiredHandled = false; // Resetear después de redirección
+              }, 500);
+            });
+          }
         }
       }
     })

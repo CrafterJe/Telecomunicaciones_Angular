@@ -1,1 +1,37 @@
-<p>account works!</p>
+<div class="account-container">
+  <h2>Editar Datos de la Cuenta</h2>
+
+  <!-- Formulario para Nombre y Apellidos -->
+  <h3>Actualizar Nombre</h3>
+  <form (ngSubmit)="updateNombre()">
+    <input type="text" [(ngModel)]="user.nombre" name="nombre" placeholder="Nombre" [disabled]="!editNombre">
+    <input type="text" [(ngModel)]="user.apellidoP" name="apellidoP" placeholder="Apellido Paterno" [disabled]="!editNombre">
+    <input type="text" [(ngModel)]="user.apellidoM" name="apellidoM" placeholder="Apellido Materno" [disabled]="!editNombre">
+    <button type="button" (click)="toggleEdit('nombre')">Editar</button>
+    <button type="submit" *ngIf="editNombre && hasChanges('nombre')">Actualizar</button>
+  </form>
+
+  <!-- Formulario para Usuario -->
+  <h3>Actualizar Usuario</h3>
+  <form (ngSubmit)="updateUsuario()">
+    <input type="text" [(ngModel)]="user.usuario" name="usuario" placeholder="Nuevo Usuario" [disabled]="!editUsuario">
+    <button type="button" (click)="toggleEdit('usuario')">Editar</button>
+    <button type="submit" *ngIf="editUsuario && hasChanges('usuario')">Actualizar</button>
+  </form>
+
+  <!-- Formulario para Email -->
+  <h3>Actualizar Email</h3>
+  <form (ngSubmit)="updateEmail()">
+    <input type="email" [(ngModel)]="user.email" name="email" placeholder="Nuevo Email" [disabled]="!editEmail">
+    <button type="button" (click)="toggleEdit('email')">Editar</button>
+    <button type="submit" *ngIf="editEmail && hasChanges('email')">Actualizar</button>
+  </form>
+
+  <!-- Formulario para Cambiar Contraseña -->
+  <h3>Cambiar Contraseña</h3>
+  <form (ngSubmit)="updatePassword()">
+    <input type="password" [(ngModel)]="passwordData.current_password" name="current_password" placeholder="Contraseña Actual">
+    <input type="password" [(ngModel)]="passwordData.new_password" name="new_password" placeholder="Nueva Contraseña">
+    <button type="submit">Actualizar</button>
+  </form>
+</div>

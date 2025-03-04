@@ -1,3 +1,12 @@
+export interface Direccion {
+  calle: string;
+  numero: string;
+  ciudad: string;
+  estado: string;
+  codigo_postal: string;
+  pais: string;
+}
+
 export interface User {
   nombre: string;
   apellidoP: string;
@@ -6,4 +15,5 @@ export interface User {
   email: string;
   password: string;
   fecha_registro: string;
+  direcciones: Direccion[]; 
 }

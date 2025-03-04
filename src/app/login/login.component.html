@@ -57,14 +57,21 @@
       </div>
 
       <div class="action-buttons">
-        <button type="submit" class="btn-login">
+        <!-- reCAPTCHA container -->
+        <div class="recaptcha-wrapper form-group d-flex justify-content-center mb-3">
+          <div id="recaptcha-container" class="g-recaptcha"></div>
+        </div>
+
+        <!-- Mensaje de carga de reCAPTCHA -->
+        <div *ngIf="!recaptchaLoaded" class="recaptcha-loading text-center mb-3">
+          Cargando reCAPTCHA...
+        </div>
+
+        <button type="submit" class="btn-login" [disabled]="!recaptchaLoaded">
           <span class="btn-text">Iniciar Sesión</span>
           <i class="btn-icon" data-feather="arrow-right"></i>
         </button>
         <br>
-
-        <!-- reCAPTCHA -->
-        <div class="g-recaptcha form-group d-flex justify-content-center mb-0" data-sitekey="6LcU3egqAAAAABFTdP3e4lFGmr_NpyhXhgSjvEDy"></div>
 
         <div class="divider">
           <span>O</span>
