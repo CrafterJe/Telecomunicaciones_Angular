@@ -69,28 +69,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
     script.async = true;
     script.defer = true;
 
-    // Add a timeout to prevent indefinite waiting
-    const scriptLoadTimeout = setTimeout(() => {
-      console.error('❌ Tiempo de espera agotado al cargar reCAPTCHA');
-      this.scriptLoaded = false;
-    }, 10000); // 10 seconds timeout
-
+    // Configurar callback global
     window.onRecaptchaLoaded = () => {
-      clearTimeout(scriptLoadTimeout);
       console.log('✅ reCAPTCHA cargado globalmente.');
       this.waitForRecaptcha();
     };
 
     script.onload = () => {
-      clearTimeout(scriptLoadTimeout);
       console.log('✅ Script de reCAPTCHA cargado.');
       this.scriptLoaded = true;
-    };
-
-    script.onerror = () => {
-      clearTimeout(scriptLoadTimeout);
-      console.error('❌ Error al cargar el script de reCAPTCHA');
-      this.scriptLoaded = false;
     };
 
     document.head.appendChild(script);
@@ -126,18 +113,10 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
       try {
-        // Clear any existing reCAPTCHA widgets
-        if (this.recaptchaWidgetId !== null) {
-          try {
-            grecaptcha.reset(this.recaptchaWidgetId);
-          } catch (resetError) {
-            console.warn('⚠️ No se pudo restablecer el widget de reCAPTCHA existente:', resetError);
-          }
-        }
+        container.innerHTML = ''; // Limpiar antes de renderizar
 
-        // Ensure the container is clean
-        container.innerHTML = '';
-        container.removeAttribute('data-rendered');
+
+        container.setAttribute('data-sitekey', this.siteKey);
 
         this.recaptchaWidgetId = grecaptcha.render(container, {
           sitekey: this.siteKey,
@@ -168,25 +147,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.recaptchaLoaded = true;
         this.alreadyRendered = true;
         this.cdRef.detectChanges();
-      } catch (e: unknown) {
-        // Properly handle the unknown error type
-        if (e instanceof Error) {
-          console.error('❌ Error al renderizar reCAPTCHA:', e.message);
-
-          // Add a fallback mechanism to reset if rendering fails
-          if (e.message.includes('already been rendered')) {
-            console.warn('🔄 Intentando recuperarse del error de renderización...');
-            try {
-              grecaptcha.reset();
-            } catch (resetError) {
-              console.error('❌ No se pudo recuperar del error de renderización:',
-                resetError instanceof Error ? resetError.message : resetError);
-            }
-          }
-        } else {
-          // Handle cases where the error is not an Error instance
-          console.error('❌ Error desconocido al renderizar reCAPTCHA:', e);
-        }
+      } catch (e) {
+        console.error('❌ Error al renderizar reCAPTCHA:', e);
       }
     } else {
       console.error('⚠️ grecaptcha aún no está disponible.');
