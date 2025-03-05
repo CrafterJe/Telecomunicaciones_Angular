@@ -85,11 +85,11 @@ export class AccountComponent {
   updateNombre() {
     this.panelAccountService.updateNombre(this.user).subscribe({
       next: () => {
-        alert("Nombre actualizado correctamente");
+        alert("Datos actualizados correctamente!");
         this.originalUser = { ...this.user }; // Guardamos cambios
         this.editNombre = false;
 
-        // 🔥 Actualizar SOLO el nombre en el Navbar (sin apellidos)
+        // Actualizar SOLO el nombre en el Navbar (sin apellidos)
         this.authService.updateNombre(this.user.nombre);
       },
       error: (err) => {
@@ -103,7 +103,7 @@ export class AccountComponent {
   updateUsuario() {
     this.panelAccountService.updateUsuario(this.user).subscribe({
       next: () => {
-        alert("Usuario actualizado correctamente");
+        alert("Usuario actualizado correctamente!");
         this.originalUser = { ...this.user };
         this.editUsuario = false;
       },
@@ -118,7 +118,7 @@ export class AccountComponent {
   updateEmail() {
     this.panelAccountService.updateEmail(this.user).subscribe({
       next: () => {
-        alert("Email actualizado correctamente");
+        alert("Email actualizado correctamente!");
         this.originalUser = { ...this.user };
         this.editEmail = false;
       },
@@ -133,7 +133,7 @@ export class AccountComponent {
   updatePassword() {
     this.panelAccountService.updatePassword(this.passwordData).subscribe({
       next: () => {
-        alert("Contraseña actualizada correctamente");
+        alert("Contraseña actualizada correctamente!");
         this.passwordData = { current_password: '', new_password: '' };
       },
       error: (err) => {

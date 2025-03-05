@@ -14,7 +14,7 @@ import { AdminProductosComponent } from './admin/admin-productos/admin-productos
 import { CheckoutComponent } from './payment/checkout/checkout.component';
 import { AccountLayoutComponent } from './layouts/account-layout/account-layout.component';
 import { AccountComponent } from './account/account/account.component';
-import { ConfigComponent } from './account/config/config.component';
+import { TransaccionesComponent } from './account/transacciones/transacciones.component';
 import { ProfileComponent } from './account/profile/profile.component';
 import { AddressesComponent } from './account/addresses/addresses.component';
 
@@ -45,7 +45,7 @@ export const routes: Routes = [
     component : AccountLayoutComponent,
     children: [
       { path : 'account' , component: AccountComponent},
-      { path : 'config' , component: ConfigComponent},
+      { path : 'transactions' , component: TransaccionesComponent},
       { path : 'profile' , component: ProfileComponent},
       { path : 'addresses' , component: AddressesComponent},
       { path : '', redirectTo: 'profile', pathMatch: 'full' } // si entran va  a /account

@@ -40,23 +40,23 @@ export class PanelAccountService {
 
 
   getProfile(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/panel_account/get-profile`, { headers: this.getHeaders() });
+    return this.http.get(`${this.apiUrl}/panel_acc/get-profile`, { headers: this.getHeaders() });
   }
 
   updateNombre(data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/panel_account/update-profile/nombre`, data, { headers: this.getHeaders() });
+    return this.http.put(`${this.apiUrl}/panel_acc/update-profile/nombre`, data, { headers: this.getHeaders() });
   }
 
 
   updateUsuario(data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/panel_account/update-profile/usuario`, data, { headers: this.getHeaders() });
+    return this.http.put(`${this.apiUrl}/panel_acc/update-profile/usuario`, data, { headers: this.getHeaders() });
   }
 
   updateEmail(data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/panel_account/update-profile/email`, data, { headers: this.getHeaders() });
+    return this.http.put(`${this.apiUrl}/panel_acc/update-profile/email`, data, { headers: this.getHeaders() });
   }
 
   updatePassword(data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/panel_account/update-profile/password`, data, { headers: this.getHeaders() });
+    return this.http.put(`${this.apiUrl}/panel_acc/update-profile/password`, data, { headers: this.getHeaders() });
   }
 }
