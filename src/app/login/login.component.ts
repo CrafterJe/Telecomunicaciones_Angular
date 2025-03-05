@@ -27,8 +27,8 @@ export class LoginComponent implements OnInit, AfterViewInit {
   recaptchaLoaded: boolean = false;
   recaptchaWidgetId: any = null;
   siteKey: string = '6LcU3egqAAAAABFTdP3e4lFGmr_NpyhXhgSjvEDy';
-  alreadyRendered: boolean = false; // Añadido de vuelta
-  private scriptLoaded: boolean = false; // Nueva bandera para controlar carga de script
+  alreadyRendered: boolean = false;
+  private scriptLoaded: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -65,14 +65,32 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     console.log('⏳ Cargando script de reCAPTCHA...');
     const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoaded&render=explicit';
+    script.src = `https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoaded`;
     script.async = true;
     script.defer = true;
 
+    // Add a timeout to prevent indefinite waiting
+    const scriptLoadTimeout = setTimeout(() => {
+      console.error('❌ Tiempo de espera agotado al cargar reCAPTCHA');
+      this.scriptLoaded = false;
+    }, 10000); // 10 seconds timeout
+
+    window.onRecaptchaLoaded = () => {
+      clearTimeout(scriptLoadTimeout);
+      console.log('✅ reCAPTCHA cargado globalmente.');
+      this.waitForRecaptcha();
+    };
+
     script.onload = () => {
+      clearTimeout(scriptLoadTimeout);
       console.log('✅ Script de reCAPTCHA cargado.');
       this.scriptLoaded = true;
-      this.waitForRecaptcha();
+    };
+
+    script.onerror = () => {
+      clearTimeout(scriptLoadTimeout);
+      console.error('❌ Error al cargar el script de reCAPTCHA');
+      this.scriptLoaded = false;
     };
 
     document.head.appendChild(script);
@@ -108,8 +126,20 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
     if (typeof grecaptcha !== 'undefined' && grecaptcha.render) {
       try {
-        container.innerHTML = ''; // Limpiar antes de renderizar
-        this.recaptchaWidgetId = grecaptcha.render('recaptcha-container', {
+        // Clear any existing reCAPTCHA widgets
+        if (this.recaptchaWidgetId !== null) {
+          try {
+            grecaptcha.reset(this.recaptchaWidgetId);
+          } catch (resetError) {
+            console.warn('⚠️ No se pudo restablecer el widget de reCAPTCHA existente:', resetError);
+          }
+        }
+
+        // Ensure the container is clean
+        container.innerHTML = '';
+        container.removeAttribute('data-rendered');
+
+        this.recaptchaWidgetId = grecaptcha.render(container, {
           sitekey: this.siteKey,
           callback: (response: any) => {
             this.ngZone.run(() => {
@@ -136,10 +166,27 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
         console.log('✅ reCAPTCHA renderizado correctamente.');
         this.recaptchaLoaded = true;
-        this.alreadyRendered = true; // Evitar futuras renderizaciones
+        this.alreadyRendered = true;
         this.cdRef.detectChanges();
-      } catch (e) {
-        console.error('❌ Error al renderizar reCAPTCHA:', e);
+      } catch (e: unknown) {
+        // Properly handle the unknown error type
+        if (e instanceof Error) {
+          console.error('❌ Error al renderizar reCAPTCHA:', e.message);
+
+          // Add a fallback mechanism to reset if rendering fails
+          if (e.message.includes('already been rendered')) {
+            console.warn('🔄 Intentando recuperarse del error de renderización...');
+            try {
+              grecaptcha.reset();
+            } catch (resetError) {
+              console.error('❌ No se pudo recuperar del error de renderización:',
+                resetError instanceof Error ? resetError.message : resetError);
+            }
+          }
+        } else {
+          // Handle cases where the error is not an Error instance
+          console.error('❌ Error desconocido al renderizar reCAPTCHA:', e);
+        }
       }
     } else {
       console.error('⚠️ grecaptcha aún no está disponible.');
