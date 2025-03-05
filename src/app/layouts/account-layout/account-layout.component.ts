@@ -22,7 +22,7 @@ export class AccountLayoutComponent implements OnInit {
     // ⛔ Si no hay sesión iniciada, redirigir a login
     if (!this.isAuthenticated) {
       console.warn("⚠️ No tienes sesión iniciada. Redirigiendo a login...");
-      this.router.navigate(['/login']);
+      this.router.navigate(['/Home']);
     }
   }
 }

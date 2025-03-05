@@ -34,7 +34,7 @@
         <!-- Condición para mostrar el nombre de usuario o el botón de iniciar sesión -->
         <li class="nav-item dropdown" *ngIf="isAuthenticated()">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {{ username }}  <!-- Muestra el nombre de usuario -->
+            {{ nombre }}  <!-- Muestra el nombre de usuario -->
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item" routerLink="/account/account">Cuenta</a></li>

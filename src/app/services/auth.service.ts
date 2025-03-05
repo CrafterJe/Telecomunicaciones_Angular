@@ -17,6 +17,7 @@ export class AuthService {
   private apiUrl = API_URL;
   private usernameSubject = new BehaviorSubject<string | null>(null);
   private roleSubject = new BehaviorSubject<string | null>(null); // Para el rol
+  private nombreSubject = new BehaviorSubject<string | null>(null);
 
   constructor(private http: HttpClient,
     private router: Router,
@@ -27,6 +28,7 @@ export class AuthService {
     this.initializeRole(); // Inicializa el estado al cargar el servicio
 
     if (isPlatformBrowser(this.platformId)) {
+      this.nombreSubject.next(this.getNombre());
       // 🔥 Guardamos una marca de que Angular está activo
       sessionStorage.setItem('angular_active', 'true');
 
@@ -211,8 +213,23 @@ export class AuthService {
   /**
    * Obtener el observable del `username`
    */
-  getUsername$(): Observable<string | null> {
-    return this.usernameSubject.asObservable();
+  // Método para obtener el nombre en tiempo real
+  getNombre$(): Observable<string | null> {
+    return this.nombreSubject.asObservable();
+  }
+
+  // Método para actualizar SOLO el nombre en el Navbar
+  updateNombre(newNombre: string): void {
+    this.nombreSubject.next(newNombre);
+    localStorage.setItem('nombre', newNombre); // Guardar solo el nombre en localStorage
+  }
+
+  // Método para obtener el nombre desde localStorage (evita errores en SSR)
+  getNombre(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('nombre');
+    }
+    return null;
   }
 
   /**
@@ -269,13 +286,18 @@ export class AuthService {
 
     try {
       const decodedToken: any = this.decodeToken(token);
-      const username = decodedToken?.nombre || 'Usuario';
+      const nombre = decodedToken?.nombre || 'Usuario';
+      const usuario = decodedToken?.usuario || '';  // 🔥 Agregamos usuario
       const userId = decodedToken?.user_id;
-      const rol = decodedToken?.rol || 'usuario'; // Si no tiene rol, se asigna usuario
+      const rol = decodedToken?.rol || 'usuario';
 
-      if (username) {
-        this.saveToLocalStorage('username', username);
-        this.usernameSubject.next(username);
+      if (nombre) {
+        this.saveToLocalStorage('nombre', nombre);
+        this.nombreSubject.next(nombre);
+      }
+
+      if (usuario) {  // 🔥 Guardamos usuario
+        this.saveToLocalStorage('usuario', usuario);
       }
 
       if (userId) {
@@ -292,8 +314,9 @@ export class AuthService {
     } catch (error) {
       console.error('Error al procesar el token en handleLogin:', error);
     }
+}
 
-  }
+
 
   /**
    * Cerrar sesión y limpiar el estado
@@ -375,6 +398,10 @@ logoutExpiredSession(): void {
   }
   getUserId(): string {
     return localStorage.getItem('userId') || '';
+  }
+
+  getUsuario(): string | null {
+    return isPlatformBrowser(this.platformId) ? localStorage.getItem('usuario') : null;
   }
 
 }

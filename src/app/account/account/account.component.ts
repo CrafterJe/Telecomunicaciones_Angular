@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { PanelAccountService } from '../../services/panel-account.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-account',
@@ -26,7 +27,9 @@ export class AccountComponent {
   editUsuario = false;
   editEmail = false;
 
-  constructor(private panelAccountService: PanelAccountService) {
+  constructor(private panelAccountService: PanelAccountService,
+    private authService: AuthService,
+  ) {
     if (typeof window !== 'undefined') {
       this.loadUserProfile(); // Solo ejecuta si está en el navegador
     } else {
@@ -85,6 +88,9 @@ export class AccountComponent {
         alert("Nombre actualizado correctamente");
         this.originalUser = { ...this.user }; // Guardamos cambios
         this.editNombre = false;
+
+        // 🔥 Actualizar SOLO el nombre en el Navbar (sin apellidos)
+        this.authService.updateNombre(this.user.nombre);
       },
       error: (err) => {
         console.error("Error al actualizar nombre:", err);
